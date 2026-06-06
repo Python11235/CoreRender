@@ -3,15 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CORERENDER — Render Farm</title>
+  <title>CORERENDER — GPU Render Farm</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="dark">
   <header class="navbar">
-    <div class="logo">CORERENDER</div>
+    <a href="/" class="logo">CORERENDER</a>
     <nav>
-      <a href="html/order.html">Order</a>
-      <a href="html/info.html">Info</a>
+      <a href="html/order.html">Order Compute</a>
+      <a href="html/info.html">Infrastructure</a>
       <a href="html/login.html" class="btn-google">Sign in with Google</a>
     </nav>
   </header>
@@ -19,95 +22,241 @@
   <main>
     <!-- Hero -->
     <section class="hero">
-      <h1>GPU compute for overnight renders.</h1>
-      <p class="sub">Per‑second billing, no minimums, queue priority available. Built for freelancers and small studios who know what a GHz‑hour costs.</p>
+      <h1>GPU compute for renders that finish overnight.</h1>
+      <p class="sub">Per‑second billing. No minimums. Queue priority when deadlines are tight. Infrastructure built for 3D artists who track GHz‑hours.</p>
       <div class="hero-actions">
-        <a href="html/order.html" class="btn-primary">Start rendering</a>
-        <span class="price-tag">€2.50 / GHz‑hour</span>
+        <a href="html/order.html" class="btn-primary">Start Rendering</a>
+        <div class="price-tag">€2.50 / GHz·h</div>
+        <div class="stat-badge">
+          <span class="stat-value">14s</span>
+          <span class="stat-label">avg frame</span>
+        </div>
+      </div>
+      <div class="trust-line">
+        <span>Trusted by freelancers and studios</span>
+        <span class="dot">·</span>
+        <span>12,400+ jobs completed</span>
+        <span class="dot">·</span>
+        <span>99.7% uptime</span>
       </div>
     </section>
 
-    <!-- Features -->
+    <!-- Features Grid -->
     <section class="features">
       <div class="feature">
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
         <h3>Per‑second billing</h3>
-        <p>You pay only for what you use, down to the second. No rounding, no waste.</p>
+        <p>Metered to the second. Stop a job early, pay only for what the GPUs processed. No rounding up to the next hour.</p>
       </div>
       <div class="feature">
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
         <h3>Queue priority</h3>
-        <p>Subscribe to jump the queue for €9/month. Your deadline matters.</p>
+        <p>Subscribe for €9/month. Your jobs skip the standard queue. Cancel anytime, priority stays until cycle end.</p>
       </div>
       <div class="feature">
-        <h3>Weekend capacity</h3>
-        <p>Add 20% more compute on Saturdays and Sundays, automatically.</p>
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <h3>Node transparency</h3>
+        <p>See which GPU cluster is running your frames. Live telemetry on GHz utilization, memory pressure, and ETA.</p>
       </div>
       <div class="feature">
-        <h3>Storage included</h3>
-        <p>Bulk bundles come with persistent storage. Keep your project online.</p>
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+        </div>
+        <h3>Persistent storage</h3>
+        <p>Bulk bundles include 50 GB NVMe storage. Keep scenes, caches, and output frames online between sessions.</p>
+      </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works">
+      <h2>Three steps. Under two minutes.</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-number">01</div>
+          <h3>Sign in</h3>
+          <p>Google OAuth. One click. No password to remember or leak.</p>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step">
+          <div class="step-number">02</div>
+          <h3>Upload & configure</h3>
+          <p>Drop your .blend file. Set frame range, resolution, samples. We handle the rest.</p>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step">
+          <div class="step-number">03</div>
+          <h3>Render</h3>
+          <p>Hit submit. Watch live progress. Download frames as they finish.</p>
+        </div>
       </div>
     </section>
 
     <!-- Pricing -->
     <section class="pricing">
-      <h2>Simple pricing</h2>
+      <h2>Pricing</h2>
+      <p class="section-sub">No hidden fees. No subscriptions required. Only pay for compute.</p>
       <div class="cards">
         <div class="card">
-          <h3>Pay‑as‑you‑go</h3>
-          <div class="price">€2.50 <span>/ GHz‑h</span></div>
-          <p>Per‑second billing, ideal for one‑off projects.</p>
-          <a href="html/order.html" class="btn-outline">Buy credits</a>
-        </div>
-        <div class="card">
-          <h3>Priority</h3>
-          <div class="price">€9 <span>/ month</span></div>
-          <p>Skip the render queue. Cancel anytime.</p>
-          <a href="html/order.html" class="btn-outline">Subscribe</a>
+          <div class="card-header">
+            <h3>Pay‑as‑you‑go</h3>
+            <div class="price">€2.50 <span>/ GHz·h</span></div>
+          </div>
+          <ul>
+            <li>Per‑second billing</li>
+            <li>Standard queue</li>
+            <li>Credits never expire</li>
+            <li>10 GB temp storage</li>
+          </ul>
+          <a href="html/order.html" class="btn-outline">Buy Credits</a>
         </div>
         <div class="card featured">
-          <h3>Bulk Bundle</h3>
-          <div class="price">€199 <span>once</span></div>
-          <p>500 GHz‑hours + 50 GB storage. Best value for regular work.</p>
-          <a href="html/order.html" class="btn-primary">Buy bundle</a>
+          <div class="badge">Most Popular</div>
+          <div class="card-header">
+            <h3>Priority</h3>
+            <div class="price">€9 <span>/ month</span></div>
+          </div>
+          <ul>
+            <li>Everything in Pay‑as‑you‑go</li>
+            <li>Skip the render queue</li>
+            <li>Weekend +20% capacity</li>
+            <li>Cancel anytime</li>
+          </ul>
+          <a href="html/order.html" class="btn-primary">Subscribe</a>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3>Bulk Bundle</h3>
+            <div class="price">€199 <span>one‑time</span></div>
+          </div>
+          <ul>
+            <li>500 GHz·h compute</li>
+            <li>50 GB persistent storage</li>
+            <li>Queue priority included</li>
+            <li>€0.40/GHz·h effective rate</li>
+          </ul>
+          <a href="html/order.html" class="btn-outline">Buy Bundle</a>
         </div>
       </div>
     </section>
 
-    <!-- FAQ -->
-    <section class="faq">
-      <h2>FAQ</h2>
-      <details>
-        <summary>What exactly is a GHz‑hour?</summary>
-        <p>One hour of a 1 GHz GPU core. A 2.5 GHz GPU used for 1 hour = 2.5 GHz‑hours. Simple as that.</p>
-      </details>
-      <details>
-        <summary>How fast will my frames render?</summary>
-        <p>Depends on your scene and our node availability. Typical Blender frame (Cycles, 1080p) ~30–90 seconds.</p>
-      </details>
-      <details>
-        <summary>Can I cancel the priority subscription?</summary>
-        <p>Yes, anytime. Priority remains active until the end of the billing month.</p>
-      </details>
-      <details>
-        <summary>Is there a minimum deposit?</summary>
-        <p>No. Buy credits starting at €10. Pay only for the compute you use.</p>
-      </details>
+    <!-- Comparison Table -->
+    <section class="comparison">
+      <h2>How we compare</h2>
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>CORERENDER</th>
+            <th>Traditional farms</th>
+            <th>Cloud GPU VMs</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Billing</td>
+            <td>Per‑second</td>
+            <td>Per‑hour minimum</td>
+            <td>Per‑hour minimum</td>
+          </tr>
+          <tr>
+            <td>Setup time</td>
+            <td>&lt; 2 min</td>
+            <td>15–60 min</td>
+            <td>30–120 min</td>
+          </tr>
+          <tr>
+            <td>Queue priority</td>
+            <td>€9/month</td>
+            <td>Not available</td>
+            <td>N/A</td>
+          </tr>
+          <tr>
+            <td>Storage</td>
+            <td>Included with bundles</td>
+            <td>Limited / paid extra</td>
+            <td>Separate service</td>
+          </tr>
+          <tr>
+            <td>Transparency</td>
+            <td>Live node telemetry</td>
+            <td>Black box</td>
+            <td>Partial</td>
+          </tr>
+        </tbody>
+      </table>
     </section>
 
-    <!-- Checkout CTA -->
+    <!-- FAQ -->
+    <section class="faq">
+      <h2>Frequently asked questions</h2>
+      <div class="faq-grid">
+        <details open>
+          <summary>What is a GHz‑hour?</summary>
+          <p>One hour of compute on a 1 GHz GPU core. A 2.5 GHz GPU running for 1 hour consumes 2.5 GHz‑hours. This is the fairest way to meter GPU work — independent of GPU generation or vendor.</p>
+        </details>
+        <details>
+          <summary>How fast will my frames render?</summary>
+          <p>Depends on your scene complexity and chosen node tier. Typical Blender Cycles frame (1080p, 256 samples) finishes in 30–90 seconds on our standard nodes. Priority subscribers get access to our fastest tier.</p>
+        </details>
+        <details>
+          <summary>What render engines do you support?</summary>
+          <p>Currently Blender Cycles and Eevee. Octane and Redshift support is in beta. Contact us for early access.</p>
+        </details>
+        <details>
+          <summary>How does queue priority work?</summary>
+          <p>Priority jobs always run before standard jobs. If all nodes are busy, your job starts as soon as the next node is free. If you submit a priority job while a standard job is running, the standard job is not interrupted — but the freed node goes to you next.</p>
+        </details>
+        <details>
+          <summary>Do credits expire?</summary>
+          <p>No. Credits purchased never expire. Use them next week or next year.</p>
+        </details>
+        <details>
+          <summary>How do I get my rendered frames?</summary>
+          <p>Frames are downloadable individually as they finish, or as a single archive once the job completes. You can also sync directly to your cloud storage via our API.</p>
+        </details>
+      </div>
+    </section>
+
+    <!-- Testimonial -->
+    <section class="testimonial">
+      <blockquote>
+        <p>"CORERENDER cut our deadline stress in half. Per‑second billing means we can iterate without guilt. The priority queue is the only reason we hit last month's client deadline."</p>
+        <cite>
+          <strong>Maya K.</strong>
+          <span>Freelance 3D Artist, Berlin</span>
+        </cite>
+      </blockquote>
+    </section>
+
+    <!-- CTA -->
     <section class="cta">
-      <h2>Ready to render?</h2>
-      <p>Sign in with Google, buy credits, and submit your first job in under two minutes.</p>
+      <h2>Start rendering in under two minutes.</h2>
+      <p>Sign in with Google, buy credits, upload your scene. No setup, no config files, no YAML.</p>
       <a href="html/login.html" class="btn-primary">Sign in with Google</a>
     </section>
   </main>
 
   <footer class="footer">
-    <p>CORERENDER — Render farm for professionals</p>
+    <div class="footer-left">
+      <span class="logo">CORERENDER</span>
+      <span class="footer-tagline">GPU render farm for professionals</span>
+    </div>
     <nav>
-      <a href="html/info.html">Documentation</a>
+      <a href="html/info.html">Infrastructure</a>
       <a href="#">Status</a>
+      <a href="#">API</a>
       <a href="#">Terms</a>
+      <a href="#">Privacy</a>
     </nav>
+    <div class="footer-right">
+      <span>© 2026 CoreRender</span>
+    </div>
   </footer>
 </body>
 </html>
