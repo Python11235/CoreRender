@@ -6,11 +6,15 @@
   <title>CORERENDER — GPU Render Farm</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="dark">
-  <header class="navbar">
+
+  <!-- Scroll progress bar -->
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <header class="navbar" id="navbar">
     <a href="/" class="logo">CORERENDER</a>
     <nav>
       <a href="html/order.html">Order Compute</a>
@@ -20,12 +24,20 @@
   </header>
 
   <main>
+
     <!-- Hero -->
     <section class="hero">
-      <h1>GPU compute for renders that finish overnight.</h1>
+      <div class="hero-eyebrow">
+        <span class="hero-eyebrow-dot"></span>
+        GPU Render Infrastructure — Live
+      </div>
+      <h1>GPU compute for renders that<br><span class="highlight">finish overnight.</span></h1>
       <p class="sub">Per‑second billing. No minimums. Queue priority when deadlines are tight. Infrastructure built for 3D artists who track GHz‑hours.</p>
       <div class="hero-actions">
-        <a href="html/order.html" class="btn-primary">Start Rendering</a>
+        <a href="html/order.html" class="btn-primary">
+          Start Rendering
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
         <div class="price-tag">€2.50 / GHz·h</div>
         <div class="stat-badge">
           <span class="stat-value">14s</span>
@@ -35,38 +47,59 @@
       <div class="trust-line">
         <span>Trusted by freelancers and studios</span>
         <span class="dot">·</span>
-        <span>12,400+ jobs completed</span>
+        <span class="count" data-count="12400" data-suffix="+">12,400+</span>
+        <span>jobs completed</span>
         <span class="dot">·</span>
         <span>99.7% uptime</span>
       </div>
     </section>
 
+    <!-- Live Stats Bar -->
+    <div class="live-stats reveal">
+      <div class="live-stat">
+        <span class="live-stat-value" data-count="847" data-suffix="">847</span>
+        <span class="live-stat-label">Nodes online</span>
+      </div>
+      <div class="live-stat">
+        <span class="live-stat-value" data-count="12400" data-suffix="+">12,400+</span>
+        <span class="live-stat-label">Jobs completed</span>
+      </div>
+      <div class="live-stat">
+        <span class="live-stat-value" data-count="99" data-suffix=".7%">99.7%</span>
+        <span class="live-stat-label">Uptime</span>
+      </div>
+      <div class="live-stat">
+        <span class="live-stat-value" data-count="14" data-suffix="s avg">14s avg</span>
+        <span class="live-stat-label">Frame time</span>
+      </div>
+    </div>
+
     <!-- Features Grid -->
     <section class="features">
-      <div class="feature">
+      <div class="feature reveal">
         <div class="feature-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         </div>
         <h3>Per‑second billing</h3>
         <p>Metered to the second. Stop a job early, pay only for what the GPUs processed. No rounding up to the next hour.</p>
       </div>
-      <div class="feature">
+      <div class="feature reveal reveal-delay-1">
         <div class="feature-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
         </div>
         <h3>Queue priority</h3>
         <p>Subscribe for €9/month. Your jobs skip the standard queue. Cancel anytime, priority stays until cycle end.</p>
       </div>
-      <div class="feature">
+      <div class="feature reveal reveal-delay-2">
         <div class="feature-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
         </div>
         <h3>Node transparency</h3>
         <p>See which GPU cluster is running your frames. Live telemetry on GHz utilization, memory pressure, and ETA.</p>
       </div>
-      <div class="feature">
+      <div class="feature reveal reveal-delay-3">
         <div class="feature-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
         </div>
         <h3>Persistent storage</h3>
         <p>Bulk bundles include 50 GB NVMe storage. Keep scenes, caches, and output frames online between sessions.</p>
@@ -75,21 +108,21 @@
 
     <!-- How It Works -->
     <section class="how-it-works">
-      <h2>Three steps. Under two minutes.</h2>
+      <h2 class="reveal">Three steps. Under two minutes.</h2>
       <div class="steps">
-        <div class="step">
+        <div class="step reveal reveal-delay-1">
           <div class="step-number">01</div>
           <h3>Sign in</h3>
           <p>Google OAuth. One click. No password to remember or leak.</p>
         </div>
-        <div class="step-divider"></div>
-        <div class="step">
+        <div class="step-divider reveal reveal-delay-2"></div>
+        <div class="step reveal reveal-delay-2">
           <div class="step-number">02</div>
           <h3>Upload & configure</h3>
           <p>Drop your .blend file. Set frame range, resolution, samples. We handle the rest.</p>
         </div>
-        <div class="step-divider"></div>
-        <div class="step">
+        <div class="step-divider reveal reveal-delay-3"></div>
+        <div class="step reveal reveal-delay-3">
           <div class="step-number">03</div>
           <h3>Render</h3>
           <p>Hit submit. Watch live progress. Download frames as they finish.</p>
@@ -99,10 +132,13 @@
 
     <!-- Pricing -->
     <section class="pricing">
-      <h2>Pricing</h2>
-      <p class="section-sub">No hidden fees. No subscriptions required. Only pay for compute.</p>
+      <div class="section-header">
+        <span class="section-label reveal">Pricing</span>
+        <h2 class="reveal">Pay for what you use.</h2>
+        <p class="section-sub reveal">No hidden fees. No subscriptions required. Only pay for compute.</p>
+      </div>
       <div class="cards">
-        <div class="card">
+        <div class="card reveal reveal-delay-1">
           <div class="card-header">
             <h3>Pay‑as‑you‑go</h3>
             <div class="price">€2.50 <span>/ GHz·h</span></div>
@@ -115,7 +151,7 @@
           </ul>
           <a href="html/order.html" class="btn-outline">Buy Credits</a>
         </div>
-        <div class="card featured">
+        <div class="card featured reveal reveal-delay-2">
           <div class="badge">Most Popular</div>
           <div class="card-header">
             <h3>Priority</h3>
@@ -129,7 +165,7 @@
           </ul>
           <a href="html/order.html" class="btn-primary">Subscribe</a>
         </div>
-        <div class="card">
+        <div class="card reveal reveal-delay-3">
           <div class="card-header">
             <h3>Bulk Bundle</h3>
             <div class="price">€199 <span>one‑time</span></div>
@@ -147,105 +183,132 @@
 
     <!-- Comparison Table -->
     <section class="comparison">
-      <h2>How we compare</h2>
-      <table>
-        <thead>
-          <tr>
-            <th></th>
-            <th>CORERENDER</th>
-            <th>Traditional farms</th>
-            <th>Cloud GPU VMs</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Billing</td>
-            <td>Per‑second</td>
-            <td>Per‑hour minimum</td>
-            <td>Per‑hour minimum</td>
-          </tr>
-          <tr>
-            <td>Setup time</td>
-            <td>&lt; 2 min</td>
-            <td>15–60 min</td>
-            <td>30–120 min</td>
-          </tr>
-          <tr>
-            <td>Queue priority</td>
-            <td>€9/month</td>
-            <td>Not available</td>
-            <td>N/A</td>
-          </tr>
-          <tr>
-            <td>Storage</td>
-            <td>Included with bundles</td>
-            <td>Limited / paid extra</td>
-            <td>Separate service</td>
-          </tr>
-          <tr>
-            <td>Transparency</td>
-            <td>Live node telemetry</td>
-            <td>Black box</td>
-            <td>Partial</td>
-          </tr>
-        </tbody>
-      </table>
+      <h2 class="reveal">How we compare</h2>
+      <div class="reveal reveal-delay-1">
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th>CORERENDER</th>
+              <th>Traditional farms</th>
+              <th>Cloud GPU VMs</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Billing</td>
+              <td>Per‑second</td>
+              <td>Per‑hour minimum</td>
+              <td>Per‑hour minimum</td>
+            </tr>
+            <tr>
+              <td>Setup time</td>
+              <td>&lt; 2 min</td>
+              <td>15–60 min</td>
+              <td>30–120 min</td>
+            </tr>
+            <tr>
+              <td>Queue priority</td>
+              <td>€9/month</td>
+              <td>Not available</td>
+              <td>N/A</td>
+            </tr>
+            <tr>
+              <td>Storage</td>
+              <td>Included with bundles</td>
+              <td>Limited / paid extra</td>
+              <td>Separate service</td>
+            </tr>
+            <tr>
+              <td>Transparency</td>
+              <td>Live node telemetry</td>
+              <td>Black box</td>
+              <td>Partial</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
     <!-- FAQ -->
     <section class="faq">
-      <h2>Frequently asked questions</h2>
+      <h2 class="reveal">Frequently asked questions</h2>
       <div class="faq-grid">
-        <details open>
-          <summary>What is a GHz‑hour?</summary>
+        <details open class="reveal">
+          <summary>
+            What is a GHz‑hour?
+            <div class="faq-icon"><div class="faq-icon-bar"></div></div>
+          </summary>
           <p>One hour of compute on a 1 GHz GPU core. A 2.5 GHz GPU running for 1 hour consumes 2.5 GHz‑hours. This is the fairest way to meter GPU work — independent of GPU generation or vendor.</p>
         </details>
-        <details>
-          <summary>How fast will my frames render?</summary>
+        <details class="reveal reveal-delay-1">
+          <summary>
+            How fast will my frames render?
+            <div class="faq-icon"><div class="faq-icon-bar"></div></div>
+          </summary>
           <p>Depends on your scene complexity and chosen node tier. Typical Blender Cycles frame (1080p, 256 samples) finishes in 30–90 seconds on our standard nodes. Priority subscribers get access to our fastest tier.</p>
         </details>
-        <details>
-          <summary>What render engines do you support?</summary>
+        <details class="reveal reveal-delay-1">
+          <summary>
+            What render engines do you support?
+            <div class="faq-icon"><div class="faq-icon-bar"></div></div>
+          </summary>
           <p>Currently Blender Cycles and Eevee. Octane and Redshift support is in beta. Contact us for early access.</p>
         </details>
-        <details>
-          <summary>How does queue priority work?</summary>
+        <details class="reveal reveal-delay-2">
+          <summary>
+            How does queue priority work?
+            <div class="faq-icon"><div class="faq-icon-bar"></div></div>
+          </summary>
           <p>Priority jobs always run before standard jobs. If all nodes are busy, your job starts as soon as the next node is free. If you submit a priority job while a standard job is running, the standard job is not interrupted — but the freed node goes to you next.</p>
         </details>
-        <details>
-          <summary>Do credits expire?</summary>
+        <details class="reveal reveal-delay-2">
+          <summary>
+            Do credits expire?
+            <div class="faq-icon"><div class="faq-icon-bar"></div></div>
+          </summary>
           <p>No. Credits purchased never expire. Use them next week or next year.</p>
         </details>
-        <details>
-          <summary>How do I get my rendered frames?</summary>
+        <details class="reveal reveal-delay-3">
+          <summary>
+            How do I get my rendered frames?
+            <div class="faq-icon"><div class="faq-icon-bar"></div></div>
+          </summary>
           <p>Frames are downloadable individually as they finish, or as a single archive once the job completes. You can also sync directly to your cloud storage via our API.</p>
         </details>
       </div>
     </section>
 
     <!-- Testimonial -->
-    <section class="testimonial">
-      <blockquote>
-        <p>"CORERENDER cut our deadline stress in half. Per‑second billing means we can iterate without guilt. The priority queue is the only reason we hit last month's client deadline."</p>
-        <cite>
-          <strong>Maya K.</strong>
-          <span>Freelance 3D Artist, Berlin</span>
-        </cite>
-      </blockquote>
+    <section class="testimonial reveal">
+      <div class="testimonial-inner">
+        <div class="quote-mark">"</div>
+        <blockquote>
+          <p>"CORERENDER cut our deadline stress in half. Per‑second billing means we can iterate without guilt. The priority queue is the only reason we hit last month's client deadline."</p>
+          <cite>
+            <strong>Maya K.</strong>
+            <span>Freelance 3D Artist — Berlin</span>
+          </cite>
+        </blockquote>
+      </div>
     </section>
 
     <!-- CTA -->
-    <section class="cta">
+    <section class="cta reveal">
       <h2>Start rendering in under two minutes.</h2>
-      <p>Sign in with Google, buy credits, upload your scene. No setup, no config files, no YAML.</p>
-      <a href="html/login.html" class="btn-primary">Sign in with Google</a>
+      <p>sign in → buy credits → upload scene. no config files. no yaml.</p>
+      <a href="html/login.html" class="btn-primary">
+        Sign in with Google
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
     </section>
+
   </main>
 
   <footer class="footer">
     <div class="footer-left">
       <span class="logo">CORERENDER</span>
-      <span class="footer-tagline">GPU render farm for professionals</span>
+      <span class="footer-tagline">// gpu render farm for professionals</span>
     </div>
     <nav>
       <a href="html/info.html">Infrastructure</a>
@@ -258,5 +321,112 @@
       <span>© 2026 CoreRender</span>
     </div>
   </footer>
+
+  <script>
+    // === Scroll progress bar ===
+    const progressBar = document.getElementById('scrollProgress');
+    const navbar = document.getElementById('navbar');
+
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = docHeight > 0 ? scrollTop / docHeight : 0;
+      progressBar.style.transform = `scaleX(${progress})`;
+
+      // Navbar state
+      if (scrollTop > 20) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    }, { passive: true });
+
+    // === Scroll reveal ===
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    // === Animated counters ===
+    function animateCounter(el) {
+      const rawValue = el.dataset.count;
+      const suffix = el.dataset.suffix || '';
+      const target = parseInt(rawValue, 10);
+      const duration = 1400;
+      const start = performance.now();
+
+      function update(now) {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        // Ease out cubic
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const current = Math.floor(eased * target);
+
+        if (target >= 1000) {
+          el.textContent = current.toLocaleString() + suffix;
+        } else {
+          el.textContent = current + suffix;
+        }
+
+        if (progress < 1) {
+          requestAnimationFrame(update);
+        } else {
+          // Reset to original display value
+          el.textContent = el.closest('.trust-line')
+            ? el.textContent
+            : (target >= 1000 ? target.toLocaleString() : target) + suffix;
+        }
+      }
+
+      requestAnimationFrame(update);
+    }
+
+    const counterObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          animateCounter(entry.target);
+          counterObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    document.querySelectorAll('.live-stat-value[data-count]').forEach(el => counterObserver.observe(el));
+
+    // === FAQ: close others when opening one ===
+    document.querySelectorAll('details').forEach(detail => {
+      detail.addEventListener('toggle', () => {
+        if (detail.open) {
+          document.querySelectorAll('details').forEach(other => {
+            if (other !== detail && other.open) {
+              other.open = false;
+            }
+          });
+        }
+      });
+    });
+
+    // === Table row highlight ===
+    document.querySelectorAll('tbody tr').forEach(row => {
+      row.addEventListener('mouseenter', () => {
+        const coreCell = row.querySelector('td:nth-child(2)');
+        if (coreCell) {
+          coreCell.style.color = 'var(--green)';
+          coreCell.style.transition = 'color 0.15s';
+        }
+      });
+      row.addEventListener('mouseleave', () => {
+        const coreCell = row.querySelector('td:nth-child(2)');
+        if (coreCell) {
+          coreCell.style.color = 'var(--text)';
+        }
+      });
+    });
+  </script>
+
 </body>
 </html>
