@@ -3,4 +3,7 @@ services:
     name: corerender
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: python server.py
+    startCommand: python3 server.py
+    envVars:
+      - key: POETRY_VIRTUALENVS_CREATE
+        value: "false"
