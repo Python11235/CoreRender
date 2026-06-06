@@ -1,16 +1,10 @@
-from flask import Flask, send_from_directory
+import http.server
+import socketserver
 import os
 
-app = Flask(__name__, static_folder='.')
+PORT = int(os.environ.get('PORT', 5000))
+Handler = http.server.SimpleHTTPRequestHandler
 
-@app.route('/')
-def index():
-    return send_from_directory('.', 'index.html')
-
-@app.route('/<path:path>')
-def serve(path):
-    return send_from_directory('.', path)
-
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+with socketserver.TCPServer(("0.0.0.0", PORT), Handler) as httpd:
+    print(f"Serving on port {PORT}")
+    httpd.serve_forever()
