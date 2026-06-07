@@ -3,426 +3,423 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CORERENDER — GPU Render Farm</title>
+  <title>RENDERBATCH — Personal GPU Batch Rendering</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="dark">
+<body>
 
-  <!-- Scroll progress bar -->
-  <div class="scroll-progress" id="scrollProgress"></div>
+  <div class="scroll-bar"><div class="scroll-bar-fill" id="progress"></div></div>
 
-  <header class="navbar" id="navbar">
-    <a href="/" class="logo">CORERENDER</a>
-    <nav>
-      <a href="html/order.html">Order Compute</a>
-      <a href="html/info.html">Infrastructure</a>
-      <a href="html/login.html" class="btn-google">Sign in with Google</a>
+  <!-- ── NAVBAR ──────────────────────────────────── -->
+  <header class="navbar" id="nav">
+    <a href="/" class="logo-wrap">
+      <div class="logo-mark">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="9" height="9" rx="1"/><rect x="13" y="2" width="9" height="9" rx="1"/><rect x="2" y="13" width="9" height="9" rx="1"/><rect x="13" y="13" width="9" height="9" rx="1"/></svg>
+      </div>
+      <span class="logo-text">RENDERBATCH</span>
+    </a>
+    <nav class="navbar-links">
+      <a href="#how">How it works</a>
+      <a href="#credits">Credits</a>
+      <a href="#faq">FAQ</a>
+      <a href="#register" class="btn-nav">Get free credits →</a>
     </nav>
   </header>
 
   <main>
 
-    <!-- Hero -->
-    <section class="hero">
-      <div class="hero-eyebrow">
-        <span class="hero-eyebrow-dot"></span>
-        GPU Render Infrastructure — Live
+    <!-- ── HERO ──────────────────────────────────── -->
+    <section class="hero section-wrap">
+      <div class="hero-kicker">
+        <span class="kicker-dot"></span>
+        Batch rendering — personal service
       </div>
-      <h1>GPU compute for renders that<br><span class="highlight">finish overnight.</span></h1>
-      <p class="sub">Per‑second billing. No minimums. Queue priority when deadlines are tight. Infrastructure built for 3D artists who track GHz‑hours.</p>
+      <h1>Your Blender scenes,<br>rendered while <em>you sleep.</em></h1>
+      <p class="hero-sub">
+        A small personal render service running on real hardware I own. Upload your <code>.blend</code>, set your frame range, and get rendered frames back. Sign up and get <strong>free credits</strong> to start — no payment info required.
+      </p>
       <div class="hero-actions">
-        <a href="html/order.html" class="btn-primary">
-          Start Rendering
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        <a href="#register" class="btn-primary" id="get-started-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          Get free credits
         </a>
-        <div class="price-tag">€2.50 / GHz·h</div>
-        <div class="stat-badge">
-          <span class="stat-value">14s</span>
-          <span class="stat-label">avg frame</span>
+        <a href="#how" class="btn-ghost">See how it works</a>
+        <div class="free-badge">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          25 GHz·h free on signup
         </div>
       </div>
-      <div class="trust-line">
-        <span>Trusted by freelancers and studios</span>
-        <span class="dot">·</span>
-        <span class="count" data-count="12400" data-suffix="+">12,400+</span>
-        <span>jobs completed</span>
-        <span class="dot">·</span>
-        <span>99.7% uptime</span>
+      <div class="trust-row">
+        <span class="hi">No credit card.</span>
+        <span class="sep">·</span>
+        <span>Blender Cycles + EEVEE.</span>
+        <span class="sep">·</span>
+        <span>Per-second billing.</span>
+        <span class="sep">·</span>
+        <span class="hi">+5 GHz·h every week.</span>
       </div>
     </section>
 
-    <!-- Live Stats Bar -->
-    <div class="live-stats reveal">
-      <div class="live-stat">
-        <span class="live-stat-value" data-count="847" data-suffix="">847</span>
-        <span class="live-stat-label">Nodes online</span>
+    <!-- ── HARDWARE BAR ───────────────────────────── -->
+    <div class="hardware-bar section-wrap reveal">
+      <span class="hw-label">Running on</span>
+      <div class="hw-cards">
+        <div class="hw-card">
+          <div class="hw-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 6V4M10 6V4M14 6V4M18 6V4M6 18v2M10 18v2M14 18v2M18 18v2"/></svg>
+          </div>
+          <div>
+            <span class="hw-name">Intel Arc B580</span>
+            <span class="hw-spec">12 GB GDDR6 · 20 Xe-cores · primary</span>
+          </div>
+        </div>
+        <div class="hw-card">
+          <div class="hw-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 6V4M10 6V4M14 6V4M18 6V4M6 18v2M10 18v2M14 18v2M18 18v2"/></svg>
+          </div>
+          <div>
+            <span class="hw-name">Tesla P4</span>
+            <span class="hw-spec">8 GB GDDR5 · Pascal · overflow queue</span>
+          </div>
+        </div>
       </div>
-      <div class="live-stat">
-        <span class="live-stat-value" data-count="12400" data-suffix="+">12,400+</span>
-        <span class="live-stat-label">Jobs completed</span>
-      </div>
-      <div class="live-stat">
-        <span class="live-stat-value" data-count="99" data-suffix=".7%">99.7%</span>
-        <span class="live-stat-label">Uptime</span>
-      </div>
-      <div class="live-stat">
-        <span class="live-stat-value" data-count="14" data-suffix="s avg">14s avg</span>
-        <span class="live-stat-label">Frame time</span>
-      </div>
+      <p class="hw-note">Real consumer + datacenter hardware. Not a cloud VM. What you see is what's running.</p>
     </div>
 
-    <!-- Features Grid -->
-    <section class="features">
-      <div class="feature reveal">
-        <div class="feature-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    <!-- ── HOW IT WORKS ───────────────────────────── -->
+    <section class="how-section section-wrap" id="how">
+      <span class="section-tag reveal">Process</span>
+      <h2 class="section-title reveal">Four steps, under three minutes.</h2>
+      <div class="steps-grid" style="margin-top:48px;">
+        <div class="step-cell reveal d1">
+          <div class="step-num">01</div>
+          <h3>Create an account</h3>
+          <p>Sign in with Google. You get <strong>25 free GHz·h</strong> immediately — no card, no form, no wait. Your weekly refill starts ticking from here.</p>
         </div>
-        <h3>Per‑second billing</h3>
-        <p>Metered to the second. Stop a job early, pay only for what the GPUs processed. No rounding up to the next hour.</p>
+        <div class="step-cell reveal d2">
+          <div class="step-num">02</div>
+          <h3>Upload your scene</h3>
+          <p>Drop your <code>.blend</code> file. Pack all external textures and assets first (<code>File → External Data → Pack Resources</code>). Max file size 2 GB.</p>
+        </div>
+        <div class="step-cell reveal d3">
+          <div class="step-num">03</div>
+          <h3>Configure the job</h3>
+          <p>Set start/end frame, render engine, resolution, sample count. We estimate cost before you hit submit so there are no surprises.</p>
+        </div>
       </div>
-      <div class="feature reveal reveal-delay-1">
-        <div class="feature-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <div class="steps-grid" style="margin-top:1px; border-radius:0 0 var(--r-lg) var(--r-lg);">
+        <div class="step-cell reveal d1" style="border-radius:0 0 0 var(--r-lg);">
+          <div class="step-num">04</div>
+          <h3>Collect your frames</h3>
+          <p>Watch live progress in the dashboard. Download finished frames as PNGs or EXRs, individually or as a zip. Files are kept for 7 days.</p>
         </div>
-        <h3>Queue priority</h3>
-        <p>Subscribe for €9/month. Your jobs skip the standard queue. Cancel anytime, priority stays until cycle end.</p>
-      </div>
-      <div class="feature reveal reveal-delay-2">
-        <div class="feature-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        <div class="step-cell reveal d2" style="background:var(--surface-up);">
+          <div class="step-num" style="background:var(--amber-glow); border-color:rgba(232,160,48,0.2); color:var(--amber);">↩</div>
+          <h3>Didn't render right?</h3>
+          <p>Credits for any failed or mis-estimated job are refunded automatically. If the hardware crashed mid-job, you pay only for completed frames.</p>
         </div>
-        <h3>Node transparency</h3>
-        <p>See which GPU cluster is running your frames. Live telemetry on GHz utilization, memory pressure, and ETA.</p>
-      </div>
-      <div class="feature reveal reveal-delay-3">
-        <div class="feature-icon">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-        </div>
-        <h3>Persistent storage</h3>
-        <p>Bulk bundles include 50 GB NVMe storage. Keep scenes, caches, and output frames online between sessions.</p>
-      </div>
-    </section>
-
-    <!-- How It Works -->
-    <section class="how-it-works">
-      <h2 class="reveal">Three steps. Under two minutes.</h2>
-      <div class="steps">
-        <div class="step reveal reveal-delay-1">
-          <div class="step-number">01</div>
-          <h3>Sign in</h3>
-          <p>Google OAuth. One click. No password to remember or leak.</p>
-        </div>
-        <div class="step-divider reveal reveal-delay-2"></div>
-        <div class="step reveal reveal-delay-2">
-          <div class="step-number">02</div>
-          <h3>Upload & configure</h3>
-          <p>Drop your .blend file. Set frame range, resolution, samples. We handle the rest.</p>
-        </div>
-        <div class="step-divider reveal reveal-delay-3"></div>
-        <div class="step reveal reveal-delay-3">
-          <div class="step-number">03</div>
-          <h3>Render</h3>
-          <p>Hit submit. Watch live progress. Download frames as they finish.</p>
+        <div class="step-cell reveal d3" style="border-radius:0 0 var(--r-lg) 0; background:var(--surface-up);">
+          <div class="step-num" style="background:var(--green-glow); border-color:rgba(109,187,122,0.2); color:var(--green);">✓</div>
+          <h3>Replenish or top up</h3>
+          <p>Your free weekly refill arrives automatically every Monday. Need more? Buy a GHz·h bundle. Bought credits never expire.</p>
         </div>
       </div>
     </section>
 
-    <!-- Pricing -->
-    <section class="pricing">
-      <div class="section-header">
-        <span class="section-label reveal">Pricing</span>
-        <h2 class="reveal">Pay for what you use.</h2>
-        <p class="section-sub reveal">No hidden fees. No subscriptions required. Only pay for compute.</p>
-      </div>
-      <div class="cards">
-        <div class="card reveal reveal-delay-1">
-          <div class="card-header">
-            <h3>Pay‑as‑you‑go</h3>
-            <div class="price">€2.50 <span>/ GHz·h</span></div>
+    <!-- ── CREDITS SYSTEM ─────────────────────────── -->
+    <section class="credits-section section-wrap" id="credits">
+      <span class="section-tag reveal">Credits</span>
+      <h2 class="section-title reveal">Free to start. Pay only when you need more.</h2>
+      <p class="section-sub reveal">Every account starts with free GHz·h. The weekly refill keeps small projects alive forever at no cost. Buy more only if you're doing heavier work.</p>
+
+      <div class="credits-grid">
+
+        <div class="credit-card featured reveal d1">
+          <span class="credit-eyebrow">On signup — free</span>
+          <div class="credit-amount">25</div>
+          <span class="credit-unit">GHz·h — no card required</span>
+          <p class="credit-desc">Enough for roughly 60–90 frames at 1080p / 256 samples in Blender Cycles on the B580. A solid test run or short animation sequence.</p>
+          <div class="credit-meta">
+            <div class="credit-row">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              No credit card needed
+            </div>
+            <div class="credit-row">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Available immediately after signup
+            </div>
+            <div class="credit-row">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Never expires
+            </div>
           </div>
-          <ul>
-            <li>Per‑second billing</li>
-            <li>Standard queue</li>
-            <li>Credits never expire</li>
-            <li>10 GB temp storage</li>
-          </ul>
-          <a href="html/order.html" class="btn-outline">Buy Credits</a>
+          <a href="#register" class="btn-primary">Create account →</a>
         </div>
-        <div class="card featured reveal reveal-delay-2">
-          <div class="badge">Most Popular</div>
-          <div class="card-header">
-            <h3>Priority</h3>
-            <div class="price">€9 <span>/ month</span></div>
+
+        <div class="credit-card reveal d2">
+          <span class="credit-eyebrow">Weekly refill — free</span>
+          <div class="credit-amount">+5</div>
+          <span class="credit-unit">GHz·h every Monday</span>
+          <p class="credit-desc">Every registered account gets a small weekly top-up automatically. Enough to keep short projects, test renders, and portfolio work going without paying a cent.</p>
+          <div class="credit-meta">
+            <div class="credit-row">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Credited every Monday morning
+            </div>
+            <div class="credit-row">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Accrues up to 50 GHz·h cap
+            </div>
+            <div class="credit-row">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              No action needed — fully automatic
+            </div>
           </div>
-          <ul>
-            <li>Everything in Pay‑as‑you‑go</li>
-            <li>Skip the render queue</li>
-            <li>Weekend +20% capacity</li>
-            <li>Cancel anytime</li>
-          </ul>
-          <a href="html/order.html" class="btn-primary">Subscribe</a>
+          <a href="#register" class="btn-ghost">Sign up to activate</a>
         </div>
-        <div class="card reveal reveal-delay-3">
-          <div class="card-header">
-            <h3>Bulk Bundle</h3>
-            <div class="price">€199 <span>one‑time</span></div>
+
+        <div class="credit-card reveal d1" style="grid-column: 1;">
+          <span class="credit-eyebrow">Top-up bundle — starter</span>
+          <div class="credit-amount">50</div>
+          <span class="credit-unit">GHz·h — €9 one-time</span>
+          <p class="credit-desc">When the free tier runs dry and you have a deadline. ~120–150 frames at 1080p Cycles. Straightforward top-up, no subscription.</p>
+          <div class="credit-meta">
+            <div class="credit-row">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              €0.18 / GHz·h effective
+            </div>
+            <div class="credit-row">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Credits never expire
+            </div>
           </div>
-          <ul>
-            <li>500 GHz·h compute</li>
-            <li>50 GB persistent storage</li>
-            <li>Queue priority included</li>
-            <li>€0.40/GHz·h effective rate</li>
-          </ul>
-          <a href="html/order.html" class="btn-outline">Buy Bundle</a>
+          <a href="#register" class="btn-ghost">Buy bundle</a>
         </div>
+
+        <div class="credit-card reveal d2" style="grid-column: 2;">
+          <span class="credit-eyebrow">Top-up bundle — heavy</span>
+          <div class="credit-amount">200</div>
+          <span class="credit-unit">GHz·h — €29 one-time</span>
+          <p class="credit-desc">For longer animations, high-sample stills, or heavy scenes. ~500–600 frames at 1080p Cycles or a full short render sequence.</p>
+          <div class="credit-meta">
+            <div class="credit-row">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              €0.145 / GHz·h effective
+            </div>
+            <div class="credit-row">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Best per-GHz·h rate
+            </div>
+          </div>
+          <a href="#register" class="btn-ghost">Buy bundle</a>
+        </div>
+
       </div>
     </section>
 
-    <!-- Comparison Table -->
-    <section class="comparison">
-      <h2 class="reveal">How we compare</h2>
-      <div class="reveal reveal-delay-1">
+    <!-- ── WHAT CAN I RENDER ──────────────────────── -->
+    <section class="examples-section section-wrap">
+      <span class="section-tag reveal">Benchmarks</span>
+      <h2 class="section-title reveal">What does a GHz·h actually get you?</h2>
+      <p class="section-sub reveal">Estimated times on the Arc B580 (primary node). Cycles scenes vary wildly by material complexity — treat these as ballpark figures.</p>
+      <div class="example-table reveal d1">
         <table>
           <thead>
             <tr>
-              <th></th>
-              <th>CORERENDER</th>
-              <th>Traditional farms</th>
-              <th>Cloud GPU VMs</th>
+              <th>Scene type</th>
+              <th>Engine</th>
+              <th>Resolution / Samples</th>
+              <th>Est. per frame</th>
+              <th>25 GHz·h buys you</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>Billing</td>
-              <td>Per‑second</td>
-              <td>Per‑hour minimum</td>
-              <td>Per‑hour minimum</td>
+              <td>Simple product shot</td>
+              <td><span class="tag-engine tag-cycles">Cycles</span></td>
+              <td class="est-cell">1080p / 128</td>
+              <td class="est-cell">~18–30s</td>
+              <td class="cost-cell">~280–450 frames</td>
             </tr>
             <tr>
-              <td>Setup time</td>
-              <td>&lt; 2 min</td>
-              <td>15–60 min</td>
-              <td>30–120 min</td>
+              <td>Typical animation frame</td>
+              <td><span class="tag-engine tag-cycles">Cycles</span></td>
+              <td class="est-cell">1080p / 256</td>
+              <td class="est-cell">~35–70s</td>
+              <td class="cost-cell">~100–200 frames</td>
             </tr>
             <tr>
-              <td>Queue priority</td>
-              <td>€9/month</td>
-              <td>Not available</td>
-              <td>N/A</td>
+              <td>Complex interior / arch-viz</td>
+              <td><span class="tag-engine tag-cycles">Cycles</span></td>
+              <td class="est-cell">1080p / 512</td>
+              <td class="est-cell">~90–180s</td>
+              <td class="cost-cell">~40–90 frames</td>
             </tr>
             <tr>
-              <td>Storage</td>
-              <td>Included with bundles</td>
-              <td>Limited / paid extra</td>
-              <td>Separate service</td>
+              <td>High-quality still</td>
+              <td><span class="tag-engine tag-cycles">Cycles</span></td>
+              <td class="est-cell">4K / 1024</td>
+              <td class="est-cell">~5–12 min</td>
+              <td class="cost-cell">~3–8 frames</td>
             </tr>
             <tr>
-              <td>Transparency</td>
-              <td>Live node telemetry</td>
-              <td>Black box</td>
-              <td>Partial</td>
+              <td>Stylised animation</td>
+              <td><span class="tag-engine tag-eevee">EEVEE</span></td>
+              <td class="est-cell">1080p / realtime</td>
+              <td class="est-cell">~2–6s</td>
+              <td class="cost-cell">~1,000–3,000 frames</td>
             </tr>
           </tbody>
         </table>
       </div>
     </section>
 
-    <!-- FAQ -->
-    <section class="faq">
-      <h2 class="reveal">Frequently asked questions</h2>
-      <div class="faq-grid">
+    <!-- ── HONESTY BOX ────────────────────────────── -->
+    <section class="honesty-section section-wrap">
+      <div class="honesty-box reveal">
+        <p>
+          <strong>A note on what this is.</strong> This is a personal side project, not a startup. I'm one person running two consumer-grade GPUs out of my own setup. That means render times are real and sometimes slower than a massive cloud farm, jobs are queued sequentially, and I might occasionally take the service down for maintenance or updates.
+        </p>
+        <p>
+          What you get in return: a straightforward service with honest pricing, no surprise charges, and a person you can actually contact if something goes wrong. If a job fails because of my hardware, you get a full refund of the credits used — no questions asked.
+        </p>
+      </div>
+    </section>
+
+    <!-- ── FAQ ───────────────────────────────────── -->
+    <section class="faq-section section-wrap" id="faq">
+      <span class="section-tag reveal">FAQ</span>
+      <h2 class="section-title reveal">Common questions.</h2>
+      <div class="faq-list">
+
         <details open class="reveal">
           <summary>
-            What is a GHz‑hour?
-            <div class="faq-icon"><div class="faq-icon-bar"></div></div>
+            What is a GHz·h and how is it calculated?
+            <span class="faq-toggle"></span>
           </summary>
-          <p>One hour of compute on a 1 GHz GPU core. A 2.5 GHz GPU running for 1 hour consumes 2.5 GHz‑hours. This is the fairest way to meter GPU work — independent of GPU generation or vendor.</p>
+          <p>One GHz·h is one hour of compute on a 1 GHz GPU core. The Arc B580 runs at around 2.8 GHz boost, so one hour on it costs approximately 2.8 GHz·h. Billing is per-second — if your frame takes 40 seconds, you pay for 40 seconds of GPU time, not a full minute or hour.</p>
         </details>
-        <details class="reveal reveal-delay-1">
+
+        <details class="reveal d1">
           <summary>
-            How fast will my frames render?
-            <div class="faq-icon"><div class="faq-icon-bar"></div></div>
+            Do I have to pack my .blend file before uploading?
+            <span class="faq-toggle"></span>
           </summary>
-          <p>Depends on your scene complexity and chosen node tier. Typical Blender Cycles frame (1080p, 256 samples) finishes in 30–90 seconds on our standard nodes. Priority subscribers get access to our fastest tier.</p>
+          <p>Yes. Go to <code>File → External Data → Pack Resources</code> in Blender before exporting. If your scene references external textures or assets that aren't packed, the render will come out black or missing materials. The uploader will warn you if it detects missing data blocks but can't fix them automatically.</p>
         </details>
-        <details class="reveal reveal-delay-1">
+
+        <details class="reveal d1">
           <summary>
-            What render engines do you support?
-            <div class="faq-icon"><div class="faq-icon-bar"></div></div>
+            What happens to my files?
+            <span class="faq-toggle"></span>
           </summary>
-          <p>Currently Blender Cycles and Eevee. Octane and Redshift support is in beta. Contact us for early access.</p>
+          <p>Uploaded scenes and rendered frames are stored locally on my server and deleted automatically after 7 days. I don't share, sell, or look at your files. If you want something removed immediately, there's a delete button in the dashboard.</p>
         </details>
-        <details class="reveal reveal-delay-2">
+
+        <details class="reveal d2">
           <summary>
-            How does queue priority work?
-            <div class="faq-icon"><div class="faq-icon-bar"></div></div>
+            Can I render with custom add-ons or Python scripts?
+            <span class="faq-toggle"></span>
           </summary>
-          <p>Priority jobs always run before standard jobs. If all nodes are busy, your job starts as soon as the next node is free. If you submit a priority job while a standard job is running, the standard job is not interrupted — but the freed node goes to you next.</p>
+          <p>Not currently. The render node runs a clean Blender install. Geometry Nodes, built-in modifiers, and stock shaders all work fine. Third-party add-ons that hook into the render pipeline aren't supported — and for security reasons, arbitrary Python execution is disabled.</p>
         </details>
-        <details class="reveal reveal-delay-2">
+
+        <details class="reveal d2">
           <summary>
-            Do credits expire?
-            <div class="faq-icon"><div class="faq-icon-bar"></div></div>
+            What Blender version do you run?
+            <span class="faq-toggle"></span>
           </summary>
-          <p>No. Credits purchased never expire. Use them next week or next year.</p>
+          <p>Currently Blender 4.2 LTS. I'll bump to new LTS releases as they stabilise. If you're on a different version and getting weird results, let me know — I keep one older build available for backwards compatibility.</p>
         </details>
-        <details class="reveal reveal-delay-3">
+
+        <details class="reveal d3">
           <summary>
-            How do I get my rendered frames?
-            <div class="faq-icon"><div class="faq-icon-bar"></div></div>
+            What if the render crashes or produces wrong output?
+            <span class="faq-toggle"></span>
           </summary>
-          <p>Frames are downloadable individually as they finish, or as a single archive once the job completes. You can also sync directly to your cloud storage via our API.</p>
+          <p>Credits for failed frames are refunded automatically within a few minutes. If output looks wrong (wrong colours, missing objects, etc.) and the cause was on my end, open a support ticket and I'll refund manually. If the issue is in your scene file, I can't refund — but I'll try to tell you why it failed.</p>
         </details>
+
+        <details class="reveal d3">
+          <summary>
+            What's the weekly refill cap and why?
+            <span class="faq-toggle"></span>
+          </summary>
+          <p>Free credits accrue up to a maximum of 50 GHz·h — so if you haven't used the service for a few weeks, you won't suddenly have 100+ hours queued up. This keeps the free tier sustainable on my hardware. Paid credits are separate and have no cap.</p>
+        </details>
+
+        <details class="reveal d4">
+          <summary>
+            Is there a job size limit?
+            <span class="faq-toggle"></span>
+          </summary>
+          <p>Upload limit is 2 GB per scene file. There's no hard limit on frame count or render duration, but extremely long jobs (multi-day estimates) may be split into batches automatically. Very VRAM-heavy scenes (approaching 10–11 GB) may fail on the B580 — the P4 is limited to 8 GB and won't handle them at all.</p>
+        </details>
+
       </div>
     </section>
 
-    <!-- Testimonial -->
-    <section class="testimonial reveal">
-      <div class="testimonial-inner">
-        <div class="quote-mark">"</div>
-        <blockquote>
-          <p>"CORERENDER cut our deadline stress in half. Per‑second billing means we can iterate without guilt. The priority queue is the only reason we hit last month's client deadline."</p>
-          <cite>
-            <strong>Maya K.</strong>
-            <span>Freelance 3D Artist — Berlin</span>
-          </cite>
-        </blockquote>
-      </div>
-    </section>
-
-    <!-- CTA -->
-    <section class="cta reveal">
-      <h2>Start rendering in under two minutes.</h2>
-      <p>sign in → buy credits → upload scene. no config files. no yaml.</p>
-      <a href="html/login.html" class="btn-primary">
-        Sign in with Google
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    <!-- ── CTA ───────────────────────────────────── -->
+    <section class="cta-section section-wrap reveal" id="register">
+      <h2>Start with 25 free GHz·h.</h2>
+      <p>No card. No setup. Just sign in and <em>upload your scene.</em></p>
+      <a href="/register" class="btn-primary">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
+        Create free account
       </a>
     </section>
 
   </main>
 
+  <!-- ── FOOTER ─────────────────────────────────── -->
   <footer class="footer">
-    <div class="footer-left">
-      <span class="logo">CORERENDER</span>
-      <span class="footer-tagline">// gpu render farm for professionals</span>
-    </div>
-    <nav>
-      <a href="html/info.html">Infrastructure</a>
+    <span class="footer-logo">RENDERBATCH</span>
+    <nav class="footer-links">
       <a href="#">Status</a>
       <a href="#">API</a>
-      <a href="#">Terms</a>
       <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Contact</a>
     </nav>
-    <div class="footer-right">
-      <span>© 2026 CoreRender</span>
-    </div>
+    <span class="footer-copy">© 2026 — made by one person with two GPUs</span>
   </footer>
 
   <script>
-    // === Scroll progress bar ===
-    const progressBar = document.getElementById('scrollProgress');
-    const navbar = document.getElementById('navbar');
-
+    // scroll progress
+    const prog = document.getElementById('progress');
+    const nav  = document.getElementById('nav');
     window.addEventListener('scroll', () => {
-      const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = docHeight > 0 ? scrollTop / docHeight : 0;
-      progressBar.style.transform = `scaleX(${progress})`;
-
-      // Navbar state
-      if (scrollTop > 20) {
-        navbar.classList.add('scrolled');
-      } else {
-        navbar.classList.remove('scrolled');
-      }
+      const s = document.documentElement.scrollTop;
+      const h = document.documentElement.scrollHeight - window.innerHeight;
+      prog.style.width = h > 0 ? (s / h * 100) + '%' : '0%';
+      nav.classList.toggle('scrolled', s > 24);
     }, { passive: true });
 
-    // === Scroll reveal ===
-    const revealObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-        }
-      });
-    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    // scroll reveal
+    const ro = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); } });
+    }, { threshold: 0.1, rootMargin: '0px 0px -32px 0px' });
+    document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
 
-    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
-
-    // === Animated counters ===
-    function animateCounter(el) {
-      const rawValue = el.dataset.count;
-      const suffix = el.dataset.suffix || '';
-      const target = parseInt(rawValue, 10);
-      const duration = 1400;
-      const start = performance.now();
-
-      function update(now) {
-        const elapsed = now - start;
-        const progress = Math.min(elapsed / duration, 1);
-        // Ease out cubic
-        const eased = 1 - Math.pow(1 - progress, 3);
-        const current = Math.floor(eased * target);
-
-        if (target >= 1000) {
-          el.textContent = current.toLocaleString() + suffix;
-        } else {
-          el.textContent = current + suffix;
-        }
-
-        if (progress < 1) {
-          requestAnimationFrame(update);
-        } else {
-          // Reset to original display value
-          el.textContent = el.closest('.trust-line')
-            ? el.textContent
-            : (target >= 1000 ? target.toLocaleString() : target) + suffix;
-        }
-      }
-
-      requestAnimationFrame(update);
-    }
-
-    const counterObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          animateCounter(entry.target);
-          counterObserver.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.5 });
-
-    document.querySelectorAll('.live-stat-value[data-count]').forEach(el => counterObserver.observe(el));
-
-    // === FAQ: close others when opening one ===
-    document.querySelectorAll('details').forEach(detail => {
-      detail.addEventListener('toggle', () => {
-        if (detail.open) {
-          document.querySelectorAll('details').forEach(other => {
-            if (other !== detail && other.open) {
-              other.open = false;
-            }
-          });
+    // faq: close siblings
+    document.querySelectorAll('details').forEach(d => {
+      d.addEventListener('toggle', () => {
+        if (d.open) {
+          document.querySelectorAll('details').forEach(o => { if (o !== d) o.open = false; });
         }
       });
     });
 
-    // === Table row highlight ===
-    document.querySelectorAll('tbody tr').forEach(row => {
-      row.addEventListener('mouseenter', () => {
-        const coreCell = row.querySelector('td:nth-child(2)');
-        if (coreCell) {
-          coreCell.style.color = 'var(--green)';
-          coreCell.style.transition = 'color 0.15s';
-        }
-      });
-      row.addEventListener('mouseleave', () => {
-        const coreCell = row.querySelector('td:nth-child(2)');
-        if (coreCell) {
-          coreCell.style.color = 'var(--text)';
+    // smooth anchor scroll
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', e => {
+        const target = document.querySelector(a.getAttribute('href'));
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       });
     });
