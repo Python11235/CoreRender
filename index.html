@@ -1,429 +1,902 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RENDERBATCH — Personal GPU Batch Rendering</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RENDERBATCH — Personal GPU Batch Rendering</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   RENDERBATCH — personal gpu batch service
+   amber-on-charcoal, workshop terminal, honest
+   ============================================================ */
+
+:root {
+  --bg:            #08080a;
+  --surface:       #0f0f12;
+  --surface-up:    #141418;
+  --surface-high:  #1a1a1f;
+  --border:        #1e1e24;
+  --border-up:     #2a2a33;
+  --border-bright: #36363f;
+  --text:          #ededf0;
+  --text-mid:      #a1a1aa;
+  --text-dim:      #6b6b75;
+  --text-faint:    #3a3a42;
+  --amber:         #ffffff;
+  --amber-bright:  #d4d4d8;
+  --amber-dim:     #71717a;
+  --amber-glow:    rgba(255,255,255,0.08);
+  --amber-subtle:  rgba(255,255,255,0.04);
+  --green:         #4ade80;
+  --green-glow:    rgba(74,222,128,0.1);
+  --font:          'DM Sans', -apple-system, sans-serif;
+  --mono:          'IBM Plex Mono', monospace;
+  --r:  6px;
+  --rl: 10px;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* grain */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 9000; opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px;
+}
+
+/* grid */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 90% 50% at 50% 0%, black, transparent);
+}
+
+/* scroll bar */
+.scroll-bar { position: fixed; top:0; left:0; height:2px; width:100%; background:var(--border); z-index:999; }
+.scroll-bar-fill { height:100%; width:0%; background:var(--green); box-shadow:0 0 8px rgba(74,222,128,0.6); transition:width 0.06s linear; }
+
+/* ── NAVBAR ─────────────────────────────── */
+.navbar {
+  position: sticky; top: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 40px; height: 56px;
+  background: rgba(8,8,10,0.92);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  transition: border-color 0.3s;
+}
+.navbar.scrolled { border-color: var(--border-up); }
+
+.logo-wrap { display:flex; align-items:center; gap:10px; text-decoration:none; }
+.logo-mark {
+  width:26px; height:26px; border:1.5px solid var(--border-up); border-radius:4px;
+  display:grid; place-items:center; color:var(--green);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.logo-wrap:hover .logo-mark { border-color:var(--green); box-shadow:0 0 10px var(--green-glow); }
+.logo-text { font-family:var(--mono); font-size:13px; font-weight:700; letter-spacing:0.16em; color:var(--text); }
+
+.navbar-links { display:flex; align-items:center; gap:4px; }
+.navbar-links a {
+  font-size:13px; font-weight:500; color:var(--text-mid); text-decoration:none;
+  padding:6px 12px; border-radius:var(--r); transition:color 0.15s, background 0.15s;
+}
+.navbar-links a:hover { color:var(--text); background:var(--surface); }
+.btn-nav {
+  font-family:var(--mono) !important; font-size:12px !important; font-weight:700 !important;
+  letter-spacing:0.04em; color:var(--bg) !important; background:var(--amber) !important;
+  padding:7px 16px !important; border-radius:var(--r) !important;
+  transition:background 0.15s, box-shadow 0.15s !important;
+}
+.btn-nav:hover { background:var(--amber-bright) !important; box-shadow:0 0 16px var(--amber-glow) !important; }
+
+/* ── HERO ───────────────────────────────── */
+.hero {
+  position: relative; z-index: 1;
+  max-width: 820px; margin: 0 auto;
+  padding: 96px 32px 80px;
+}
+
+.hero::before {
+  content:''; position:absolute; top:-60px; left:-100px; width:700px; height:500px;
+  background:radial-gradient(ellipse at top left, rgba(74,222,128,0.06) 0%, transparent 65%);
+  pointer-events:none;
+}
+
+.hero-kicker {
+  display:inline-flex; align-items:center; gap:8px;
+  font-family:var(--mono); font-size:11px; font-weight:600;
+  letter-spacing:0.14em; text-transform:uppercase; color:var(--green);
+  margin-bottom:24px;
+  opacity:0; animation:fade-up 0.5s 0.05s ease forwards;
+}
+.kicker-dot {
+  width:6px; height:6px; border-radius:50%; background:var(--green);
+  animation:breathe 2.5s ease-in-out infinite;
+}
+@keyframes breathe {
+  0%,100% { opacity:1; box-shadow:0 0 4px var(--green); }
+  50%      { opacity:0.4; box-shadow:none; }
+}
+
+.hero h1 {
+  font-family:var(--font); font-size:clamp(36px,5.5vw,60px);
+  font-weight:600; line-height:1.08; letter-spacing:-0.035em;
+  color:var(--text); margin-bottom:22px;
+  opacity:0; animation:fade-up 0.6s 0.15s ease forwards;
+}
+.hero h1 em { font-style:normal; color:var(--amber); }
+
+.hero-sub {
+  font-size:16px; color:var(--text-mid); max-width:540px;
+  line-height:1.75; margin-bottom:38px; font-weight:300;
+  opacity:0; animation:fade-up 0.6s 0.28s ease forwards;
+}
+.hero-sub code, code {
+  font-family:var(--mono); font-size:12px; background:var(--surface-up);
+  border:1px solid var(--border-up); padding:2px 6px; border-radius:3px; color:var(--text-mid);
+}
+.hero-sub strong { color:var(--text); font-weight:600; }
+
+.hero-actions {
+  display:flex; gap:12px; align-items:center; flex-wrap:wrap;
+  margin-bottom:40px;
+  opacity:0; animation:fade-up 0.6s 0.4s ease forwards;
+}
+
+.free-badge {
+  display:inline-flex; align-items:center; gap:7px;
+  font-family:var(--mono); font-size:12px; font-weight:500;
+  color:var(--green); background:var(--green-glow);
+  border:1px solid rgba(109,187,122,0.22);
+  padding:10px 16px; border-radius:var(--r);
+}
+
+.trust-row {
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  opacity:0; animation:fade-up 0.6s 0.52s ease forwards;
+}
+.trust-row span { font-family:var(--mono); font-size:11.5px; color:var(--text-dim); letter-spacing:0.03em; }
+.trust-row .sep { color:var(--border-bright); }
+.trust-row .hi  { color:var(--text-mid); }
+
+/* ── BUTTONS ────────────────────────────── */
+.btn-primary {
+  display:inline-flex; align-items:center; gap:8px;
+  background:var(--amber); color:var(--bg);
+  font-family:var(--mono); font-size:13px; font-weight:700; letter-spacing:0.03em;
+  padding:12px 24px; border-radius:var(--r); text-decoration:none;
+  transition:background 0.15s, box-shadow 0.15s, transform 0.12s;
+  position:relative; overflow:hidden;
+}
+.btn-primary::after {
+  content:''; position:absolute; top:0; left:-100%; width:100%; height:100%;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  transition:left 0.35s ease;
+}
+.btn-primary:hover { background:var(--amber-bright); box-shadow:0 6px 20px var(--amber-glow); transform:translateY(-1px); }
+.btn-primary:hover::after { left:100%; }
+.btn-primary:active { transform:translateY(0); }
+
+.btn-ghost {
+  display:inline-flex; align-items:center; gap:8px;
+  background:transparent; color:var(--text-mid);
+  font-family:var(--mono); font-size:12.5px; font-weight:500;
+  padding:12px 20px; border-radius:var(--r);
+  border:1px solid var(--border-up); text-decoration:none;
+  transition:color 0.15s, border-color 0.15s, background 0.15s;
+}
+.btn-ghost:hover { color:var(--text); border-color:var(--border-bright); background:var(--surface); }
+
+/* ── HARDWARE BAR ───────────────────────── */
+.hardware-bar {
+  position:relative; z-index:1;
+  margin:0 40px 80px;
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--rl);
+  padding:28px 36px;
+  display:flex; align-items:center; gap:32px; flex-wrap:wrap;
+  overflow:hidden;
+}
+.hardware-bar::before {
+  content:''; position:absolute; left:0; top:0; bottom:0;
+  width:3px; background:linear-gradient(to bottom, var(--green), rgba(74,222,128,0.3));
+}
+.hw-label {
+  font-family:var(--mono); font-size:10px; font-weight:600;
+  letter-spacing:0.18em; text-transform:uppercase; color:var(--text-dim); white-space:nowrap;
+}
+.hw-cards { display:flex; gap:14px; flex-wrap:wrap; flex:1; }
+.hw-card {
+  display:flex; align-items:flex-start; gap:12px;
+  background:var(--surface-up); border:1px solid var(--border-up);
+  border-radius:var(--r); padding:14px 18px; flex:1; min-width:200px;
+  transition:border-color 0.2s;
+}
+.hw-card:hover { border-color:var(--border-bright); }
+.hw-icon {
+  width:30px; height:30px; background:var(--surface-high);
+  border:1px solid var(--border-bright); border-radius:5px;
+  display:grid; place-items:center; flex-shrink:0; color:var(--green);
+}
+.hw-name { font-family:var(--mono); font-size:12px; font-weight:700; color:var(--text); display:block; margin-bottom:3px; }
+.hw-spec { font-family:var(--mono); font-size:10.5px; color:var(--text-dim); display:block; }
+.hw-card.coming-soon {
+  border-style: dashed;
+  border-color: var(--border-up);
+  background: transparent;
+  opacity: 0.6;
+  transition: opacity 0.2s, border-color 0.2s;
+}
+.hw-card.coming-soon:hover { opacity: 0.85; border-color: var(--border-bright); }
+.hw-icon.dim { color: var(--text-faint); border-color: var(--border); background: transparent; }
+.hw-name.dim { color: var(--text-dim); }
+.hw-spec.dim { color: var(--text-faint); }
+
+/* ── SECTION CHROME ─────────────────────── */
+.section-tag {
+  display:inline-block; font-family:var(--mono); font-size:10.5px; font-weight:700;
+  letter-spacing:0.18em; text-transform:uppercase; color:var(--green); margin-bottom:12px;
+}
+.section-title {
+  font-size:clamp(22px,3vw,30px); font-weight:600; letter-spacing:-0.025em;
+  color:var(--text); line-height:1.2; margin-bottom:8px;
+}
+.section-sub {
+  font-size:14.5px; color:var(--text-mid); font-weight:300;
+  max-width:500px; line-height:1.7; margin-bottom:0;
+}
+
+/* ── HOW IT WORKS ───────────────────────── */
+.how-section {
+  max-width:960px; margin:0 auto 100px; padding:0 40px;
+  position:relative; z-index:1;
+}
+.how-section .section-title { margin-bottom:48px; }
+
+.steps-grid {
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:1px; background:var(--border);
+  border:1px solid var(--border); border-radius:var(--rl); overflow:hidden;
+}
+.steps-grid + .steps-grid {
+  border-top:none; border-radius:0 0 var(--rl) var(--rl); margin-top:0;
+}
+
+.step-cell {
+  background:var(--surface); padding:32px 28px;
+  transition:background 0.2s;
+}
+.step-cell:hover { background:var(--surface-up); }
+.step-cell.alt { background:var(--surface-up); }
+
+.step-num {
+  font-family:var(--mono); font-size:11px; font-weight:700; letter-spacing:0.1em;
+  color:var(--green); background:var(--green-glow);
+  border:1px solid rgba(74,222,128,0.2);
+  display:inline-block; padding:3px 9px; border-radius:3px; margin-bottom:18px;
+}
+.step-num.green-num {
+  color:var(--green); background:var(--green-glow);
+  border-color:rgba(109,187,122,0.2);
+}
+
+.step-cell h3 { font-size:15px; font-weight:600; color:var(--text); margin-bottom:8px; letter-spacing:-0.01em; }
+.step-cell p  { font-size:13.5px; color:var(--text-dim); line-height:1.7; }
+.step-cell strong { color:var(--text-mid); font-weight:600; }
+
+/* ── CREDITS ────────────────────────────── */
+.credits-section {
+  max-width:960px; margin:0 auto 100px; padding:0 40px;
+  position:relative; z-index:1;
+}
+.credits-section .section-sub { margin-bottom:48px; }
+
+.credits-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:14px;
+}
+
+.credit-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--rl); padding:28px; display:flex; flex-direction:column; gap:16px;
+  position:relative; overflow:hidden;
+  transition:border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+.credit-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+}
+.credit-card:hover { border-color:var(--border-bright); transform:translateY(-2px); box-shadow:0 12px 40px rgba(0,0,0,0.35); }
+
+.credit-card.featured {
+  border-color:rgba(255,255,255,0.15);
+  background:linear-gradient(145deg, rgba(255,255,255,0.03) 0%, var(--surface) 55%);
+}
+.credit-card.featured::before { background:linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent); }
+.credit-card.featured:hover { border-color:rgba(255,255,255,0.28); box-shadow:0 12px 40px rgba(255,255,255,0.04); }
+
+.credit-eyebrow {
+  font-family:var(--mono); font-size:10.5px; font-weight:700;
+  letter-spacing:0.16em; text-transform:uppercase; color:var(--text-dim); display:block;
+}
+.credit-card.featured .credit-eyebrow { color:var(--amber-dim); }
+
+.credit-amount {
+  font-family:var(--mono); font-size:44px; font-weight:700;
+  color:var(--text); letter-spacing:-0.03em; line-height:1;
+}
+.credit-card.featured .credit-amount { color:var(--amber); }
+
+.credit-unit { font-family:var(--mono); font-size:12px; color:var(--text-dim); }
+
+.credit-desc { font-size:13.5px; color:var(--text-mid); line-height:1.7; font-weight:300; flex:1; }
+
+.credit-meta { display:flex; flex-direction:column; gap:7px; }
+.credit-row { display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text-mid); }
+.credit-row svg { color:var(--green); flex-shrink:0; }
+.credit-card.featured .credit-row svg { color:var(--amber); }
+
+/* ── BENCHMARKS ─────────────────────────── */
+.examples-section {
+  max-width:960px; margin:0 auto 100px; padding:0 40px;
+  position:relative; z-index:1;
+}
+.examples-section .section-sub { margin-bottom:48px; }
+
+.example-table {
+  width:100%; border:1px solid var(--border); border-radius:var(--rl); overflow:hidden;
+}
+.example-table table { width:100%; border-collapse:collapse; font-size:13.5px; }
+.example-table thead th {
+  text-align:left; padding:14px 18px;
+  background:var(--surface);
+  font-family:var(--mono); font-size:10.5px; font-weight:700;
+  letter-spacing:0.12em; text-transform:uppercase; color:var(--text-dim);
+  border-bottom:1px solid var(--border);
+}
+.example-table tbody td {
+  padding:13px 18px; border-bottom:1px solid var(--border);
+  color:var(--text-mid); vertical-align:middle; transition:background 0.12s;
+}
+.example-table tbody tr:last-child td { border-bottom:none; }
+.example-table tbody tr:hover td { background:var(--surface); }
+.example-table tbody td:first-child { color:var(--text); font-weight:500; }
+
+.tag-engine {
+  font-family:var(--mono); font-size:11px; padding:3px 8px;
+  border-radius:3px; font-weight:600; letter-spacing:0.04em; white-space:nowrap;
+}
+.tag-cycles { background:rgba(74,158,255,0.1); color:#4a9eff; border:1px solid rgba(74,158,255,0.2); }
+.tag-eevee  { background:rgba(109,187,122,0.1); color:var(--green); border:1px solid rgba(109,187,122,0.2); }
+.cost-cell  { font-family:var(--mono); font-size:12.5px; color:var(--amber) !important; font-weight:600; }
+.est-cell   { font-family:var(--mono); font-size:12px; color:var(--text-dim) !important; }
+
+/* ── HONESTY BOX ────────────────────────── */
+.honesty-section {
+  max-width:720px; margin:0 auto 100px; padding:0 40px;
+  position:relative; z-index:1;
+}
+.honesty-box {
+  background:var(--surface); border:1px solid var(--border-up);
+  border-radius:var(--rl); padding:36px 40px;
+  position:relative; overflow:hidden;
+}
+.honesty-box::before {
+  content:''; position:absolute; left:0; top:0; bottom:0;
+  width:3px; background:var(--border-bright);
+}
+.honesty-box p { font-size:14.5px; color:var(--text-mid); line-height:1.8; font-weight:300; font-style:italic; }
+.honesty-box p + p { margin-top:14px; }
+.honesty-box strong { font-style:normal; font-weight:600; color:var(--text); }
+
+/* ── FAQ ────────────────────────────────── */
+.faq-section {
+  max-width:700px; margin:0 auto 100px; padding:0 40px;
+  position:relative; z-index:1;
+}
+.faq-section .section-title { margin-bottom:40px; }
+.faq-list {}
+
+details { border-top:1px solid var(--border); overflow:hidden; }
+details:last-of-type { border-bottom:1px solid var(--border); }
+
+summary {
+  list-style:none; cursor:pointer;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:20px 0; font-size:14.5px; font-weight:500; color:var(--text);
+  user-select:none; transition:color 0.15s; gap:16px;
+}
+summary::-webkit-details-marker { display:none; }
+summary:hover { color:var(--amber-bright); }
+
+.faq-toggle {
+  flex-shrink:0; width:20px; height:20px;
+  border:1px solid var(--border-up); border-radius:3px;
+  display:grid; place-items:center;
+  transition:border-color 0.15s, background 0.15s;
+  position:relative;
+}
+.faq-toggle::before,
+.faq-toggle::after {
+  content:''; position:absolute; background:var(--text-dim);
+  transition:transform 0.2s, background 0.15s;
+}
+.faq-toggle::before { width:8px; height:1.5px; }
+.faq-toggle::after  { width:1.5px; height:8px; }
+
+details[open] .faq-toggle { border-color:rgba(255,255,255,0.2); background:rgba(255,255,255,0.04); }
+details[open] .faq-toggle::before { background:var(--text); }
+details[open] .faq-toggle::after  { transform:scaleY(0); background:var(--text); }
+
+details p {
+  font-size:13.5px; color:var(--text-dim); line-height:1.75;
+  padding-bottom:20px; padding-right:36px; font-weight:300;
+}
+details p code { font-family:var(--mono); font-size:11.5px; background:var(--surface-up); border:1px solid var(--border-up); padding:2px 6px; border-radius:3px; color:var(--text-mid); }
+
+/* ── CTA ────────────────────────────────── */
+.cta-section {
+  text-align:center; padding:90px 32px;
+  background:var(--surface);
+  border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+  position:relative; overflow:hidden; z-index:1;
+}
+.cta-section::before {
+  content:''; position:absolute; inset:0;
+  background:radial-gradient(ellipse at center, rgba(74,222,128,0.04) 0%, transparent 70%);
+  pointer-events:none;
+}
+.cta-section h2 { font-size:clamp(24px,3vw,32px); font-weight:600; letter-spacing:-0.03em; margin-bottom:12px; position:relative; }
+.cta-section p  { font-size:14px; color:var(--text-dim); margin-bottom:32px; font-family:var(--mono); position:relative; }
+.cta-section p em { color:var(--green); font-style:normal; }
+
+/* ── FOOTER ─────────────────────────────── */
+.footer {
+  display:flex; align-items:center; justify-content:space-between;
+  flex-wrap:wrap; gap:16px; padding:24px 40px;
+  border-top:1px solid var(--border); position:relative; z-index:1;
+}
+.footer-logo { font-family:var(--mono); font-size:12px; font-weight:700; letter-spacing:0.16em; color:var(--text-dim); }
+.footer-links { display:flex; gap:20px; }
+.footer-links a { font-size:12.5px; color:var(--text-dim); text-decoration:none; transition:color 0.15s; }
+.footer-links a:hover { color:var(--text-mid); }
+.footer-copy { font-family:var(--mono); font-size:11.5px; color:var(--text-faint); }
+
+/* ── REVEAL ─────────────────────────────── */
+.reveal { opacity:0; transform:translateY(20px); transition:opacity 0.55s ease, transform 0.55s ease; }
+.reveal.in { opacity:1; transform:none; }
+.d1 { transition-delay:0.08s; }
+.d2 { transition-delay:0.16s; }
+.d3 { transition-delay:0.24s; }
+.d4 { transition-delay:0.32s; }
+
+@keyframes fade-up { to { opacity:1; transform:none; } }
+
+/* ── RESPONSIVE ─────────────────────────── */
+@media (max-width:800px) {
+  .navbar { padding:0 20px; }
+  .navbar-links a:not(.btn-nav) { display:none; }
+  .hero { padding:72px 20px 60px; }
+  .hardware-bar { margin:0 20px 64px; padding:22px 24px; flex-direction:column; gap:20px; }
+  .steps-grid { grid-template-columns:1fr; }
+  .credits-grid { grid-template-columns:1fr; max-width:440px; }
+  .how-section, .credits-section, .examples-section,
+  .faq-section, .honesty-section { padding:0 20px; }
+  .example-table { overflow-x:auto; }
+  .example-table table { min-width:580px; }
+  .footer { flex-direction:column; align-items:flex-start; }
+}
+@media (max-width:520px) {
+  .hero h1 { font-size:32px; }
+  .hero-actions { flex-direction:column; align-items:flex-start; }
+  .footer { padding:20px; }
+}
+</style>
 </head>
 <body>
 
-  <div class="scroll-bar"><div class="scroll-bar-fill" id="progress"></div></div>
+<div class="scroll-bar"><div class="scroll-bar-fill" id="progress"></div></div>
 
-  <!-- ── NAVBAR ──────────────────────────────────── -->
-  <header class="navbar" id="nav">
-    <a href="/" class="logo-wrap">
-      <div class="logo-mark">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="9" height="9" rx="1"/><rect x="13" y="2" width="9" height="9" rx="1"/><rect x="2" y="13" width="9" height="9" rx="1"/><rect x="13" y="13" width="9" height="9" rx="1"/></svg>
-      </div>
-      <span class="logo-text">RENDERBATCH</span>
-    </a>
-    <nav class="navbar-links">
-      <a href="#how">How it works</a>
-      <a href="#credits">Credits</a>
-      <a href="#faq">FAQ</a>
-      <a href="#register" class="btn-nav">Get free credits →</a>
-    </nav>
-  </header>
-
-  <main>
-
-    <!-- ── HERO ──────────────────────────────────── -->
-    <section class="hero section-wrap">
-      <div class="hero-kicker">
-        <span class="kicker-dot"></span>
-        Batch rendering — personal service
-      </div>
-      <h1>Your Blender scenes,<br>rendered while <em>you sleep.</em></h1>
-      <p class="hero-sub">
-        A small personal render service running on real hardware I own. Upload your <code>.blend</code>, set your frame range, and get rendered frames back. Sign up and get <strong>free credits</strong> to start — no payment info required.
-      </p>
-      <div class="hero-actions">
-        <a href="#register" class="btn-primary" id="get-started-btn">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-          Get free credits
-        </a>
-        <a href="#how" class="btn-ghost">See how it works</a>
-        <div class="free-badge">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          25 GHz·h free on signup
-        </div>
-      </div>
-      <div class="trust-row">
-        <span class="hi">No credit card.</span>
-        <span class="sep">·</span>
-        <span>Blender Cycles + EEVEE.</span>
-        <span class="sep">·</span>
-        <span>Per-second billing.</span>
-        <span class="sep">·</span>
-        <span class="hi">+5 GHz·h every week.</span>
-      </div>
-    </section>
-
-    <!-- ── HARDWARE BAR ───────────────────────────── -->
-    <div class="hardware-bar section-wrap reveal">
-      <span class="hw-label">Running on</span>
-      <div class="hw-cards">
-        <div class="hw-card">
-          <div class="hw-icon">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 6V4M10 6V4M14 6V4M18 6V4M6 18v2M10 18v2M14 18v2M18 18v2"/></svg>
-          </div>
-          <div>
-            <span class="hw-name">Intel Arc B580</span>
-            <span class="hw-spec">12 GB GDDR6 · 20 Xe-cores · primary</span>
-          </div>
-        </div>
-        <div class="hw-card">
-          <div class="hw-icon">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 6V4M10 6V4M14 6V4M18 6V4M6 18v2M10 18v2M14 18v2M18 18v2"/></svg>
-          </div>
-          <div>
-            <span class="hw-name">Tesla P4</span>
-            <span class="hw-spec">8 GB GDDR5 · Pascal · overflow queue</span>
-          </div>
-        </div>
-      </div>
-      <p class="hw-note">Real consumer + datacenter hardware. Not a cloud VM. What you see is what's running.</p>
+<!-- NAVBAR -->
+<header class="navbar" id="nav">
+  <a href="/" class="logo-wrap">
+    <div class="logo-mark">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="9" height="9" rx="1"/><rect x="13" y="2" width="9" height="9" rx="1"/><rect x="2" y="13" width="9" height="9" rx="1"/><rect x="13" y="13" width="9" height="9" rx="1"/></svg>
     </div>
+    <span class="logo-text">RENDERBATCH</span>
+  </a>
+  <nav class="navbar-links">
+    <a href="#how">How it works</a>
+    <a href="#credits">Credits</a>
+    <a href="#faq">FAQ</a>
+    <a href="#register" class="btn-nav">Get free credits →</a>
+  </nav>
+</header>
 
-    <!-- ── HOW IT WORKS ───────────────────────────── -->
-    <section class="how-section section-wrap" id="how">
-      <span class="section-tag reveal">Process</span>
-      <h2 class="section-title reveal">Four steps, under three minutes.</h2>
-      <div class="steps-grid" style="margin-top:48px;">
-        <div class="step-cell reveal d1">
-          <div class="step-num">01</div>
-          <h3>Create an account</h3>
-          <p>Sign in with Google. You get <strong>25 free GHz·h</strong> immediately — no card, no form, no wait. Your weekly refill starts ticking from here.</p>
-        </div>
-        <div class="step-cell reveal d2">
-          <div class="step-num">02</div>
-          <h3>Upload your scene</h3>
-          <p>Drop your <code>.blend</code> file. Pack all external textures and assets first (<code>File → External Data → Pack Resources</code>). Max file size 2 GB.</p>
-        </div>
-        <div class="step-cell reveal d3">
-          <div class="step-num">03</div>
-          <h3>Configure the job</h3>
-          <p>Set start/end frame, render engine, resolution, sample count. We estimate cost before you hit submit so there are no surprises.</p>
-        </div>
-      </div>
-      <div class="steps-grid" style="margin-top:1px; border-radius:0 0 var(--r-lg) var(--r-lg);">
-        <div class="step-cell reveal d1" style="border-radius:0 0 0 var(--r-lg);">
-          <div class="step-num">04</div>
-          <h3>Collect your frames</h3>
-          <p>Watch live progress in the dashboard. Download finished frames as PNGs or EXRs, individually or as a zip. Files are kept for 7 days.</p>
-        </div>
-        <div class="step-cell reveal d2" style="background:var(--surface-up);">
-          <div class="step-num" style="background:var(--amber-glow); border-color:rgba(232,160,48,0.2); color:var(--amber);">↩</div>
-          <h3>Didn't render right?</h3>
-          <p>Credits for any failed or mis-estimated job are refunded automatically. If the hardware crashed mid-job, you pay only for completed frames.</p>
-        </div>
-        <div class="step-cell reveal d3" style="border-radius:0 0 var(--r-lg) 0; background:var(--surface-up);">
-          <div class="step-num" style="background:var(--green-glow); border-color:rgba(109,187,122,0.2); color:var(--green);">✓</div>
-          <h3>Replenish or top up</h3>
-          <p>Your free weekly refill arrives automatically every Monday. Need more? Buy a GHz·h bundle. Bought credits never expire.</p>
-        </div>
-      </div>
-    </section>
+<main>
 
-    <!-- ── CREDITS SYSTEM ─────────────────────────── -->
-    <section class="credits-section section-wrap" id="credits">
-      <span class="section-tag reveal">Credits</span>
-      <h2 class="section-title reveal">Free to start. Pay only when you need more.</h2>
-      <p class="section-sub reveal">Every account starts with free GHz·h. The weekly refill keeps small projects alive forever at no cost. Buy more only if you're doing heavier work.</p>
-
-      <div class="credits-grid">
-
-        <div class="credit-card featured reveal d1">
-          <span class="credit-eyebrow">On signup — free</span>
-          <div class="credit-amount">25</div>
-          <span class="credit-unit">GHz·h — no card required</span>
-          <p class="credit-desc">Enough for roughly 60–90 frames at 1080p / 256 samples in Blender Cycles on the B580. A solid test run or short animation sequence.</p>
-          <div class="credit-meta">
-            <div class="credit-row">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              No credit card needed
-            </div>
-            <div class="credit-row">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              Available immediately after signup
-            </div>
-            <div class="credit-row">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              Never expires
-            </div>
-          </div>
-          <a href="#register" class="btn-primary">Create account →</a>
-        </div>
-
-        <div class="credit-card reveal d2">
-          <span class="credit-eyebrow">Weekly refill — free</span>
-          <div class="credit-amount">+5</div>
-          <span class="credit-unit">GHz·h every Monday</span>
-          <p class="credit-desc">Every registered account gets a small weekly top-up automatically. Enough to keep short projects, test renders, and portfolio work going without paying a cent.</p>
-          <div class="credit-meta">
-            <div class="credit-row">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              Credited every Monday morning
-            </div>
-            <div class="credit-row">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              Accrues up to 50 GHz·h cap
-            </div>
-            <div class="credit-row">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              No action needed — fully automatic
-            </div>
-          </div>
-          <a href="#register" class="btn-ghost">Sign up to activate</a>
-        </div>
-
-        <div class="credit-card reveal d1" style="grid-column: 1;">
-          <span class="credit-eyebrow">Top-up bundle — starter</span>
-          <div class="credit-amount">50</div>
-          <span class="credit-unit">GHz·h — €9 one-time</span>
-          <p class="credit-desc">When the free tier runs dry and you have a deadline. ~120–150 frames at 1080p Cycles. Straightforward top-up, no subscription.</p>
-          <div class="credit-meta">
-            <div class="credit-row">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              €0.18 / GHz·h effective
-            </div>
-            <div class="credit-row">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              Credits never expire
-            </div>
-          </div>
-          <a href="#register" class="btn-ghost">Buy bundle</a>
-        </div>
-
-        <div class="credit-card reveal d2" style="grid-column: 2;">
-          <span class="credit-eyebrow">Top-up bundle — heavy</span>
-          <div class="credit-amount">200</div>
-          <span class="credit-unit">GHz·h — €29 one-time</span>
-          <p class="credit-desc">For longer animations, high-sample stills, or heavy scenes. ~500–600 frames at 1080p Cycles or a full short render sequence.</p>
-          <div class="credit-meta">
-            <div class="credit-row">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              €0.145 / GHz·h effective
-            </div>
-            <div class="credit-row">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-              Best per-GHz·h rate
-            </div>
-          </div>
-          <a href="#register" class="btn-ghost">Buy bundle</a>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- ── WHAT CAN I RENDER ──────────────────────── -->
-    <section class="examples-section section-wrap">
-      <span class="section-tag reveal">Benchmarks</span>
-      <h2 class="section-title reveal">What does a GHz·h actually get you?</h2>
-      <p class="section-sub reveal">Estimated times on the Arc B580 (primary node). Cycles scenes vary wildly by material complexity — treat these as ballpark figures.</p>
-      <div class="example-table reveal d1">
-        <table>
-          <thead>
-            <tr>
-              <th>Scene type</th>
-              <th>Engine</th>
-              <th>Resolution / Samples</th>
-              <th>Est. per frame</th>
-              <th>25 GHz·h buys you</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Simple product shot</td>
-              <td><span class="tag-engine tag-cycles">Cycles</span></td>
-              <td class="est-cell">1080p / 128</td>
-              <td class="est-cell">~18–30s</td>
-              <td class="cost-cell">~280–450 frames</td>
-            </tr>
-            <tr>
-              <td>Typical animation frame</td>
-              <td><span class="tag-engine tag-cycles">Cycles</span></td>
-              <td class="est-cell">1080p / 256</td>
-              <td class="est-cell">~35–70s</td>
-              <td class="cost-cell">~100–200 frames</td>
-            </tr>
-            <tr>
-              <td>Complex interior / arch-viz</td>
-              <td><span class="tag-engine tag-cycles">Cycles</span></td>
-              <td class="est-cell">1080p / 512</td>
-              <td class="est-cell">~90–180s</td>
-              <td class="cost-cell">~40–90 frames</td>
-            </tr>
-            <tr>
-              <td>High-quality still</td>
-              <td><span class="tag-engine tag-cycles">Cycles</span></td>
-              <td class="est-cell">4K / 1024</td>
-              <td class="est-cell">~5–12 min</td>
-              <td class="cost-cell">~3–8 frames</td>
-            </tr>
-            <tr>
-              <td>Stylised animation</td>
-              <td><span class="tag-engine tag-eevee">EEVEE</span></td>
-              <td class="est-cell">1080p / realtime</td>
-              <td class="est-cell">~2–6s</td>
-              <td class="cost-cell">~1,000–3,000 frames</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- ── HONESTY BOX ────────────────────────────── -->
-    <section class="honesty-section section-wrap">
-      <div class="honesty-box reveal">
-        <p>
-          <strong>A note on what this is.</strong> This is a personal side project, not a startup. I'm one person running two consumer-grade GPUs out of my own setup. That means render times are real and sometimes slower than a massive cloud farm, jobs are queued sequentially, and I might occasionally take the service down for maintenance or updates.
-        </p>
-        <p>
-          What you get in return: a straightforward service with honest pricing, no surprise charges, and a person you can actually contact if something goes wrong. If a job fails because of my hardware, you get a full refund of the credits used — no questions asked.
-        </p>
-      </div>
-    </section>
-
-    <!-- ── FAQ ───────────────────────────────────── -->
-    <section class="faq-section section-wrap" id="faq">
-      <span class="section-tag reveal">FAQ</span>
-      <h2 class="section-title reveal">Common questions.</h2>
-      <div class="faq-list">
-
-        <details open class="reveal">
-          <summary>
-            What is a GHz·h and how is it calculated?
-            <span class="faq-toggle"></span>
-          </summary>
-          <p>One GHz·h is one hour of compute on a 1 GHz GPU core. The Arc B580 runs at around 2.8 GHz boost, so one hour on it costs approximately 2.8 GHz·h. Billing is per-second — if your frame takes 40 seconds, you pay for 40 seconds of GPU time, not a full minute or hour.</p>
-        </details>
-
-        <details class="reveal d1">
-          <summary>
-            Do I have to pack my .blend file before uploading?
-            <span class="faq-toggle"></span>
-          </summary>
-          <p>Yes. Go to <code>File → External Data → Pack Resources</code> in Blender before exporting. If your scene references external textures or assets that aren't packed, the render will come out black or missing materials. The uploader will warn you if it detects missing data blocks but can't fix them automatically.</p>
-        </details>
-
-        <details class="reveal d1">
-          <summary>
-            What happens to my files?
-            <span class="faq-toggle"></span>
-          </summary>
-          <p>Uploaded scenes and rendered frames are stored locally on my server and deleted automatically after 7 days. I don't share, sell, or look at your files. If you want something removed immediately, there's a delete button in the dashboard.</p>
-        </details>
-
-        <details class="reveal d2">
-          <summary>
-            Can I render with custom add-ons or Python scripts?
-            <span class="faq-toggle"></span>
-          </summary>
-          <p>Not currently. The render node runs a clean Blender install. Geometry Nodes, built-in modifiers, and stock shaders all work fine. Third-party add-ons that hook into the render pipeline aren't supported — and for security reasons, arbitrary Python execution is disabled.</p>
-        </details>
-
-        <details class="reveal d2">
-          <summary>
-            What Blender version do you run?
-            <span class="faq-toggle"></span>
-          </summary>
-          <p>Currently Blender 4.2 LTS. I'll bump to new LTS releases as they stabilise. If you're on a different version and getting weird results, let me know — I keep one older build available for backwards compatibility.</p>
-        </details>
-
-        <details class="reveal d3">
-          <summary>
-            What if the render crashes or produces wrong output?
-            <span class="faq-toggle"></span>
-          </summary>
-          <p>Credits for failed frames are refunded automatically within a few minutes. If output looks wrong (wrong colours, missing objects, etc.) and the cause was on my end, open a support ticket and I'll refund manually. If the issue is in your scene file, I can't refund — but I'll try to tell you why it failed.</p>
-        </details>
-
-        <details class="reveal d3">
-          <summary>
-            What's the weekly refill cap and why?
-            <span class="faq-toggle"></span>
-          </summary>
-          <p>Free credits accrue up to a maximum of 50 GHz·h — so if you haven't used the service for a few weeks, you won't suddenly have 100+ hours queued up. This keeps the free tier sustainable on my hardware. Paid credits are separate and have no cap.</p>
-        </details>
-
-        <details class="reveal d4">
-          <summary>
-            Is there a job size limit?
-            <span class="faq-toggle"></span>
-          </summary>
-          <p>Upload limit is 2 GB per scene file. There's no hard limit on frame count or render duration, but extremely long jobs (multi-day estimates) may be split into batches automatically. Very VRAM-heavy scenes (approaching 10–11 GB) may fail on the B580 — the P4 is limited to 8 GB and won't handle them at all.</p>
-        </details>
-
-      </div>
-    </section>
-
-    <!-- ── CTA ───────────────────────────────────── -->
-    <section class="cta-section section-wrap reveal" id="register">
-      <h2>Start with 25 free GHz·h.</h2>
-      <p>No card. No setup. Just sign in and <em>upload your scene.</em></p>
-      <a href="/register" class="btn-primary">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
-        Create free account
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-kicker">
+      <span class="kicker-dot"></span>
+      Batch rendering — personal service
+    </div>
+    <h1>Your Blender scenes,<br>rendered while <em>you sleep.</em></h1>
+    <p class="hero-sub">
+      A small personal render service running on real hardware I own. Upload your <code>.blend</code>, set your frame range, and get rendered frames back. Sign up and get <strong>free credits</strong> to start — no payment info required.
+    </p>
+    <div class="hero-actions">
+      <a href="#register" class="btn-primary">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        Get free credits
       </a>
-    </section>
+      <a href="#how" class="btn-ghost">See how it works</a>
+      <div class="free-badge">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        25 GHz·h free on signup
+      </div>
+    </div>
+    <div class="trust-row">
+      <span class="hi">No credit card.</span>
+      <span class="sep">·</span>
+      <span>Blender Cycles + EEVEE.</span>
+      <span class="sep">·</span>
+      <span>Per-second billing.</span>
+      <span class="sep">·</span>
+      <span class="hi">+5 GHz·h every week.</span>
+    </div>
+  </section>
 
-  </main>
+  <!-- HARDWARE BAR -->
+  <div class="hardware-bar reveal">
+    <span class="hw-label">Running on</span>
+    <div class="hw-cards">
+      <div class="hw-card">
+        <div class="hw-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 6V4M10 6V4M14 6V4M18 6V4M6 18v2M10 18v2M14 18v2M18 18v2"/></svg>
+        </div>
+        <div>
+          <span class="hw-name">Intel Arc B580</span>
+          <span class="hw-spec">12 GB GDDR6 · 20 Xe-cores · primary</span>
+        </div>
+      </div>
+      <div class="hw-card">
+        <div class="hw-icon">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 6V4M10 6V4M14 6V4M18 6V4M6 18v2M10 18v2M14 18v2M18 18v2"/></svg>
+        </div>
+        <div>
+          <span class="hw-name">Tesla P4</span>
+          <span class="hw-spec">8 GB GDDR5 · Pascal · overflow queue</span>
+        </div>
+      </div>
+      <div class="hw-card coming-soon">
+        <div class="hw-icon dim">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 6V4M10 6V4M14 6V4M18 6V4M6 18v2M10 18v2M14 18v2M18 18v2"/></svg>
+        </div>
+        <div>
+          <span class="hw-name dim">Next GPU — coming soon</span>
+          <span class="hw-spec dim">100% of farm revenue goes toward hardware upgrades</span>
+        </div>
+      </div>
+    </div>
+    <p class="hw-note">Real hardware, not a cloud VM. Every credit you spend grows the farm.</p>
+  </div>
 
-  <!-- ── FOOTER ─────────────────────────────────── -->
-  <footer class="footer">
-    <span class="footer-logo">RENDERBATCH</span>
-    <nav class="footer-links">
-      <a href="#">Status</a>
-      <a href="#">API</a>
-      <a href="#">Privacy</a>
-      <a href="#">Terms</a>
-      <a href="#">Contact</a>
-    </nav>
-    <span class="footer-copy">© 2026 — made by one person with two GPUs</span>
-  </footer>
+  <!-- HOW IT WORKS -->
+  <section class="how-section" id="how">
+    <span class="section-tag reveal">Process</span>
+    <h2 class="section-title reveal">Four steps, under three minutes.</h2>
 
-  <script>
-    // scroll progress
-    const prog = document.getElementById('progress');
-    const nav  = document.getElementById('nav');
-    window.addEventListener('scroll', () => {
-      const s = document.documentElement.scrollTop;
-      const h = document.documentElement.scrollHeight - window.innerHeight;
-      prog.style.width = h > 0 ? (s / h * 100) + '%' : '0%';
-      nav.classList.toggle('scrolled', s > 24);
-    }, { passive: true });
+    <div class="steps-grid">
+      <div class="step-cell reveal d1">
+        <div class="step-num">01</div>
+        <h3>Create an account</h3>
+        <p>Sign in with Google. You get <strong>25 free GHz·h</strong> immediately — no card, no form, no wait. Your weekly refill starts ticking from here.</p>
+      </div>
+      <div class="step-cell reveal d2">
+        <div class="step-num">02</div>
+        <h3>Upload your scene</h3>
+        <p>Drop your <code>.blend</code> file. Pack all external assets first via <code>File → External Data → Pack Resources</code>. Max file size 2 GB.</p>
+      </div>
+      <div class="step-cell reveal d3">
+        <div class="step-num">03</div>
+        <h3>Configure the job</h3>
+        <p>Set frame range, render engine, resolution, sample count. We show a cost estimate before you hit submit — no surprises.</p>
+      </div>
+      <div class="step-cell reveal d1">
+        <div class="step-num">04</div>
+        <h3>Collect your frames</h3>
+        <p>Watch live progress in the dashboard. Download frames as PNGs or EXRs, individually or as a zip. Files are kept for 7 days.</p>
+      </div>
+      <div class="step-cell alt reveal d2">
+        <div class="step-num">↩</div>
+        <h3>Didn't render right?</h3>
+        <p>Credits for failed or mis-estimated jobs are refunded automatically. Hardware crash mid-job? You pay only for completed frames.</p>
+      </div>
+      <div class="step-cell alt reveal d3">
+        <div class="step-num green-num">✓</div>
+        <h3>Replenish or top up</h3>
+        <p>Free weekly refill arrives every Monday. Need more? Buy a GHz·h bundle. Bought credits never expire.</p>
+      </div>
+    </div>
+  </section>
 
-    // scroll reveal
-    const ro = new IntersectionObserver(entries => {
-      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); } });
-    }, { threshold: 0.1, rootMargin: '0px 0px -32px 0px' });
-    document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+  <!-- CREDITS -->
+  <section class="credits-section" id="credits">
+    <span class="section-tag reveal">Credits</span>
+    <h2 class="section-title reveal">Free to start. Pay only when you need more.</h2>
+    <p class="section-sub reveal">Every account starts with free GHz·h. The weekly refill keeps small projects alive at no cost. Buy more only if you're doing heavier work.</p>
 
-    // faq: close siblings
-    document.querySelectorAll('details').forEach(d => {
-      d.addEventListener('toggle', () => {
-        if (d.open) {
-          document.querySelectorAll('details').forEach(o => { if (o !== d) o.open = false; });
-        }
-      });
+    <div class="credits-grid" style="margin-top:48px;">
+
+      <div class="credit-card featured reveal d1">
+        <span class="credit-eyebrow">On signup — free</span>
+        <div class="credit-amount">25</div>
+        <span class="credit-unit">GHz·h — no card required</span>
+        <p class="credit-desc">Enough for roughly 60–90 frames at 1080p / 256 samples in Blender Cycles on the B580. A solid test run or short animation sequence.</p>
+        <div class="credit-meta">
+          <div class="credit-row">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            No credit card needed
+          </div>
+          <div class="credit-row">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Available immediately after signup
+          </div>
+          <div class="credit-row">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Never expires
+          </div>
+        </div>
+        <a href="#register" class="btn-primary" style="align-self:flex-start;">Create account →</a>
+      </div>
+
+      <div class="credit-card reveal d2">
+        <span class="credit-eyebrow">Weekly refill — free</span>
+        <div class="credit-amount">+5</div>
+        <span class="credit-unit">GHz·h every Monday</span>
+        <p class="credit-desc">Every registered account gets a small weekly top-up automatically. Enough to keep short projects, test renders, and portfolio work going at no cost.</p>
+        <div class="credit-meta">
+          <div class="credit-row">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Credited every Monday morning
+          </div>
+          <div class="credit-row">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Accrues up to 50 GHz·h cap
+          </div>
+          <div class="credit-row">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Fully automatic — no action needed
+          </div>
+        </div>
+        <a href="#register" class="btn-ghost" style="align-self:flex-start;">Sign up to activate</a>
+      </div>
+
+      <div class="credit-card reveal d1">
+        <span class="credit-eyebrow">Top-up bundle — starter</span>
+        <div class="credit-amount">50</div>
+        <span class="credit-unit">GHz·h — €9 one-time</span>
+        <p class="credit-desc">When the free tier runs dry and you have a deadline. ~120–150 frames at 1080p Cycles. Straightforward top-up, no subscription.</p>
+        <div class="credit-meta">
+          <div class="credit-row">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            €0.18 / GHz·h effective rate
+          </div>
+          <div class="credit-row">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Credits never expire
+          </div>
+        </div>
+        <a href="#register" class="btn-ghost" style="align-self:flex-start;">Buy bundle</a>
+      </div>
+
+      <div class="credit-card reveal d2">
+        <span class="credit-eyebrow">Top-up bundle — heavy</span>
+        <div class="credit-amount">200</div>
+        <span class="credit-unit">GHz·h — €29 one-time</span>
+        <p class="credit-desc">For longer animations, high-sample stills, or complex scenes. ~500–600 frames at 1080p Cycles or a full short render sequence.</p>
+        <div class="credit-meta">
+          <div class="credit-row">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            €0.145 / GHz·h — best rate
+          </div>
+          <div class="credit-row">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Credits never expire
+          </div>
+        </div>
+        <a href="#register" class="btn-ghost" style="align-self:flex-start;">Buy bundle</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- BENCHMARKS -->
+  <section class="examples-section">
+    <span class="section-tag reveal">Benchmarks</span>
+    <h2 class="section-title reveal">What does a GHz·h actually get you?</h2>
+    <p class="section-sub reveal">Estimated times on the Arc B580 (primary node). Cycles scenes vary by material complexity — treat these as ballpark figures.</p>
+
+    <div class="example-table reveal d1" style="margin-top:48px;">
+      <table>
+        <thead>
+          <tr>
+            <th>Scene type</th>
+            <th>Engine</th>
+            <th>Res / Samples</th>
+            <th>Est. per frame</th>
+            <th>25 GHz·h gets you</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Simple product shot</td>
+            <td><span class="tag-engine tag-cycles">Cycles</span></td>
+            <td class="est-cell">1080p / 128</td>
+            <td class="est-cell">~18–30s</td>
+            <td class="cost-cell">~280–450 frames</td>
+          </tr>
+          <tr>
+            <td>Typical animation frame</td>
+            <td><span class="tag-engine tag-cycles">Cycles</span></td>
+            <td class="est-cell">1080p / 256</td>
+            <td class="est-cell">~35–70s</td>
+            <td class="cost-cell">~100–200 frames</td>
+          </tr>
+          <tr>
+            <td>Complex interior / arch-viz</td>
+            <td><span class="tag-engine tag-cycles">Cycles</span></td>
+            <td class="est-cell">1080p / 512</td>
+            <td class="est-cell">~90–180s</td>
+            <td class="cost-cell">~40–90 frames</td>
+          </tr>
+          <tr>
+            <td>High-quality still</td>
+            <td><span class="tag-engine tag-cycles">Cycles</span></td>
+            <td class="est-cell">4K / 1024</td>
+            <td class="est-cell">~5–12 min</td>
+            <td class="cost-cell">~3–8 frames</td>
+          </tr>
+          <tr>
+            <td>Stylised animation</td>
+            <td><span class="tag-engine tag-eevee">EEVEE</span></td>
+            <td class="est-cell">1080p / realtime</td>
+            <td class="est-cell">~2–6s</td>
+            <td class="cost-cell">~1,000–3,000 frames</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq-section" id="faq">
+    <span class="section-tag reveal">FAQ</span>
+    <h2 class="section-title reveal">Common questions.</h2>
+    <div class="faq-list">
+
+      <details open class="reveal">
+        <summary>What is a GHz·h and how is it calculated?<span class="faq-toggle"></span></summary>
+        <p>One GHz·h is one hour of compute on a 1 GHz GPU core. The Arc B580 runs at around 2.8 GHz boost, so one hour on it costs ~2.8 GHz·h. Billing is per-second — a 40-second frame costs 40 seconds of GPU time, not a full minute.</p>
+      </details>
+
+      <details class="reveal d1">
+        <summary>Do I need to pack my .blend before uploading?<span class="faq-toggle"></span></summary>
+        <p>Yes. Go to <code>File → External Data → Pack Resources</code> in Blender first. If your scene references unpacked external textures, the render will come out black or missing materials. The uploader will warn you about missing data blocks.</p>
+      </details>
+
+      <details class="reveal d1">
+        <summary>What happens to my files?<span class="faq-toggle"></span></summary>
+        <p>Uploaded scenes and rendered frames are stored locally and deleted automatically after 7 days. I don't share, sell, or look at your files. There's a delete button in the dashboard if you want them gone immediately.</p>
+      </details>
+
+      <details class="reveal d2">
+        <summary>Can I use custom add-ons or Python scripts?<span class="faq-toggle"></span></summary>
+        <p>Not currently. The render node runs a clean Blender install. Geometry Nodes, built-in modifiers, and stock shaders all work fine. Third-party add-ons that hook into the render pipeline aren't supported, and arbitrary Python execution is disabled for security.</p>
+      </details>
+
+      <details class="reveal d2">
+        <summary>What Blender version do you run?<span class="faq-toggle"></span></summary>
+        <p>Currently Blender 4.2 LTS. I'll update to new LTS releases as they stabilise. If you're on a different version and getting weird results, let me know — I keep one older build available for backwards compatibility.</p>
+      </details>
+
+      <details class="reveal d3">
+        <summary>What if the render crashes or looks wrong?<span class="faq-toggle"></span></summary>
+        <p>Credits for failed frames are refunded automatically within a few minutes. If output looks wrong and the cause was on my end, open a support ticket and I'll refund manually. If the issue is in your scene file, I can't refund — but I'll tell you what went wrong.</p>
+      </details>
+
+      <details class="reveal d3">
+        <summary>Why is there a weekly refill cap?<span class="faq-toggle"></span></summary>
+        <p>Free credits accrue up to 50 GHz·h maximum. This keeps the free tier sustainable on my hardware. If you haven't used the service in weeks you won't suddenly have 100+ hours queued. Paid credits are separate and have no cap.</p>
+      </details>
+
+      <details class="reveal d4">
+        <summary>Is there a job size limit?<span class="faq-toggle"></span></summary>
+        <p>Upload limit is 2 GB per scene file. No hard limit on frame count, but very long jobs may be split into batches automatically. VRAM-heavy scenes approaching 10–11 GB may fail on the B580 — the P4 is capped at 8 GB and won't handle them.</p>
+      </details>
+
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section reveal" id="register">
+    <h2>Start with 25 free GHz·h.</h2>
+    <p>No card. No setup. Just sign in and <em>upload your scene.</em></p>
+    <a href="/register" class="btn-primary">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
+      Create free account
+    </a>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <span class="footer-logo">RENDERBATCH</span>
+  <nav class="footer-links">
+    <a href="#">Status</a>
+    <a href="#">API</a>
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+    <a href="#">Contact</a>
+  </nav>
+  <span class="footer-copy">© 2026 — made by one person with two GPUs</span>
+</footer>
+
+<script>
+  const prog = document.getElementById('progress');
+  const nav  = document.getElementById('nav');
+
+  window.addEventListener('scroll', () => {
+    const s = document.documentElement.scrollTop;
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    prog.style.width = h > 0 ? (s / h * 100) + '%' : '0%';
+    nav.classList.toggle('scrolled', s > 24);
+  }, { passive: true });
+
+  const ro = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('in');
+      } else {
+        e.target.classList.remove('in');
+      }
     });
+  }, { threshold: 0.08, rootMargin: '0px 0px -24px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
 
-    // smooth anchor scroll
-    document.querySelectorAll('a[href^="#"]').forEach(a => {
-      a.addEventListener('click', e => {
-        const target = document.querySelector(a.getAttribute('href'));
-        if (target) {
-          e.preventDefault();
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      });
+  document.querySelectorAll('details').forEach(d => {
+    d.addEventListener('toggle', () => {
+      if (d.open) document.querySelectorAll('details').forEach(o => { if (o !== d) o.open = false; });
     });
-  </script>
+  });
 
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const t = document.querySelector(a.getAttribute('href'));
+      if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    });
+  });
+</script>
 </body>
 </html>
